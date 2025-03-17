@@ -1,0 +1,10 @@
+{
+  "ok": "OK",
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "copied-to-clipboard": "Copied to clipboard",
+  "navigation-panel": {
+    "dashboard": "Dashboard",
+    "tool-session": "Tool Session"
+  }
+}
