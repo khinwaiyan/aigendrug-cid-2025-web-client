@@ -16,6 +16,7 @@ import { Session } from "../../service/session/interface";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useService } from "../../service/use-service";
+import { unwrapOr } from "../../service/service-wrapper";
 
 export default function ItemsTable() {
   const { t } = useTranslation(["dashboard", "base", "chatWidget"]);
@@ -71,7 +72,7 @@ export default function ItemsTable() {
 
   async function fetchSessions() {
     setLoading(true);
-    const sessions = await sessionService.getAllSessions();
+    const sessions = unwrapOr(await sessionService.getAllSessions(), []);
     updateGenerateState({ openedSessions: sessions });
     setLoading(false);
   }

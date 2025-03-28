@@ -46,15 +46,16 @@ export interface ToolProviderInterface {
 export interface Tool {
   id: string;
   name: string;
-  description?: string;
-  image_url?: string;
+  version: string;
+  description: string;
   created_at: string;
   provider_interface: ToolProviderInterface;
 }
 
 export interface CreateToolDTO {
+  id: string;
   name: string;
-  description?: string;
-  image_url?: string;
+  version: string;
+  description: string;
   provider_interface: ToolProviderInterface;
 }

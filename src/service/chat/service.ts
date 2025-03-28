@@ -1,6 +1,7 @@
 import { AxiosInstance } from "axios";
 
 import { ChatMessage, CreateChatMessageDTO } from "./interface";
+import { Result, wrapPromise } from "../service-wrapper";
 
 export class ChatService {
   private instance: AxiosInstance;
@@ -9,13 +10,19 @@ export class ChatService {
     this.instance = instance;
   }
 
-  async getChatMesssageBySessionId(sessionId: string): Promise<ChatMessage[]> {
-    const res = await this.instance.get(`/chat/message/${sessionId}`);
-
-    return res.data;
+  async getChatMesssageBySessionId(
+    sessionId: string
+  ): Promise<Result<ChatMessage[]>> {
+    return wrapPromise(
+      this.instance.get(`/chat/message/${sessionId}`).then((res) => res.data)
+    );
   }
 
-  async createChatMessage(chatMessage: CreateChatMessageDTO) {
-    await this.instance.post(`/chat/message`, chatMessage);
+  async createChatMessage(
+    chatMessage: CreateChatMessageDTO
+  ): Promise<Result<void>> {
+    return wrapPromise(
+      this.instance.post(`/chat/message`, chatMessage).then((res) => res.data)
+    );
   }
 }

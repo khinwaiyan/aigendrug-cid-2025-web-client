@@ -15,6 +15,7 @@
     "@cloudscape-design/components": "^3.0.923",
     "@cloudscape-design/design-tokens": "^3.0.52",
     "@cloudscape-design/global-styles": "^1.0.38",
+    "ace-builds": "^1.39.1",
     "axios": "^1.8.3",
     "i18next": "^24.2.3",
     "i18next-browser-languagedetector": "^8.0.4",

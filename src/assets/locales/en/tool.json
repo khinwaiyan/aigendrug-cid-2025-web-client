@@ -1,0 +1,18 @@
+{
+  "registration": {
+    "title": "Tool Registration"
+  },
+  "no-items": "No items",
+  "no-items-description": "There are no items to display",
+  "upload-json": "Upload JSON",
+  "table": {
+    "title": "Tools",
+    "add-item": "Add Tool",
+    "delete": "Delete",
+    "column": {
+      "name": "Name",
+      "status": "Status",
+      "tool-id": "Tool ID"
+    }
+  }
+}
