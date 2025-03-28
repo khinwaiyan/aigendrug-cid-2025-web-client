@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import {
-  ChatMessage,
-  CreateChatMessageDTO,
-} from "../../service/chat/interface";
+  CreateToolMessageDTO,
+  ToolMessage,
+} from "../../service/tool/interface";
 
-export default function useWebSocket(
+export default function useToolWebSocket(
   sessionID: string,
-  onMessageReceived: (message: ChatMessage) => void
+  onMessageReceived: (message: ToolMessage) => void
 ) {
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [isWaiting, setIsWaiting] = useState<boolean>(false);
@@ -18,8 +18,8 @@ export default function useWebSocket(
     // WebSocket 연결
     const ws = new WebSocket(
       import.meta.env.PROD
-        ? `wss://api-aigendrug-cid-2025.luidium.com/v1/chat/session/ws?sessionID=${sessionID}`
-        : `ws://localhost:8080/v1/chat/session/ws?sessionID=${sessionID}`
+        ? `wss://api-aigendrug-cid-2025.luidium.com/v1/tool/session/ws?sessionID=${sessionID}`
+        : `ws://localhost:8080/v1/tool/session/ws?sessionID=${sessionID}`
     );
     socketRef.current = ws;
 
@@ -30,7 +30,8 @@ export default function useWebSocket(
 
     ws.onmessage = (event) => {
       const message = JSON.parse(event.data);
-      if (message.status === "finished") {
+      // Check: Tool message doesn't have message_type
+      if (message.message_type === 1) {
         setIsWaiting(false);
       }
 
@@ -46,16 +47,15 @@ export default function useWebSocket(
     return () => {
       ws.close();
     };
-  }, [sessionID]);
+  }, [sessionID, onMessageReceived]);
 
-  const sendMessage = (messageContent: CreateChatMessageDTO) => {
+  const sendMessage = (messageContent: CreateToolMessageDTO) => {
     if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
       const message = {
         session_id: sessionID,
+        tool_id: messageContent.tool_id,
         role: messageContent.role,
-        message: messageContent.message,
-        message_type: 0,
-        linked_tool_ids: [],
+        data: messageContent.data,
       };
 
       socketRef.current.send(JSON.stringify(message));

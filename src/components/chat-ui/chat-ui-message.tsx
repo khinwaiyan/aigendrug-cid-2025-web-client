@@ -12,6 +12,11 @@ import ReactMarkdown from "react-markdown";
 import styles from "../../styles/chat-ui.module.scss";
 import { ChatMessage } from "../../service/chat/interface";
 import { useTranslation } from "react-i18next";
+import { useService } from "../../service/use-service";
+import { useEffect, useState } from "react";
+import { Tool } from "../../service/tool/interface";
+import { unwrapOrThrow } from "../../service/service-wrapper";
+import { useGeneralContext } from "../../context/general-context";
 
 export interface ChatUIMessageProps {
   message: ChatMessage;
@@ -20,6 +25,24 @@ export interface ChatUIMessageProps {
 
 export default function ChatUIMessage(props: ChatUIMessageProps) {
   const { t } = useTranslation();
+  const { toolService } = useService();
+  const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
+  const { updateGenerateState } = useGeneralContext();
+
+  useEffect(() => {
+    if (props.message?.role !== "system") {
+      return;
+    }
+
+    const fetch = async () => {
+      const tool = unwrapOrThrow(
+        await toolService.getTool(props.message.message)
+      );
+      setSelectedTool(tool);
+    };
+
+    fetch();
+  }, []);
 
   return (
     <div className={styles.chat_message}>
@@ -97,6 +120,23 @@ export default function ChatUIMessage(props: ChatUIMessageProps) {
       {props.message?.role === "user" && (
         <div className={styles.user_message}>
           <TextContent>{props.message.message}</TextContent>
+        </div>
+      )}
+      {props.message?.role === "system" && (
+        <div className={styles.system_message}>
+          <Button
+            loading={selectedTool === null}
+            iconAlign="right"
+            iconName="external"
+            variant="primary"
+            onClick={() => {
+              updateGenerateState({
+                isChatWidgetOpen: false,
+              });
+            }}
+          >
+            {selectedTool?.name}
+          </Button>
         </div>
       )}
     </div>
