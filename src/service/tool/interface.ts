@@ -59,3 +59,19 @@ export interface CreateToolDTO {
   description: string;
   provider_interface: ToolProviderInterface;
 }
+
+export interface ToolMessage {
+  id: string;
+  session_id: string;
+  tool_id: string;
+  role: string;
+  data: Record<string, unknown>;
+  created_at: string;
+}
+
+export interface CreateToolMessageDTO {
+  session_id: string;
+  tool_id: string;
+  role: string;
+  data: Record<string, unknown>;
+}

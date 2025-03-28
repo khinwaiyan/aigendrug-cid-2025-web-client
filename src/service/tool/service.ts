@@ -13,6 +13,12 @@ export class ToolService {
     return wrapPromise(this.instance.get("/tool").then((res) => res.data));
   }
 
+  async getTool(id: string): Promise<Result<Tool>> {
+    return wrapPromise(
+      this.instance.get(`/tool/${id}`).then((res) => res.data)
+    );
+  }
+
   async createTool(data: CreateToolDTO): Promise<Result<Tool>> {
     return wrapPromise(
       this.instance.post("/tool", data).then((res) => res.data)

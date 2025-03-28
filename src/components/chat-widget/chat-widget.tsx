@@ -20,7 +20,7 @@ import { Session } from "../../service/session/interface";
 import { ChatUI } from "../chat-ui/chat-ui";
 import { ChatMessage } from "../../service/chat/interface";
 import { Avatar } from "@cloudscape-design/chat-components";
-import useWebSocket from "../../common/hooks/use-websocket";
+import useChatWebSocket from "../../common/hooks/use-chat-websocket";
 import { isOk, unwrapOr, unwrapOrThrow } from "../../service/service-wrapper";
 
 export default function ChatWidget() {
@@ -39,7 +39,7 @@ export default function ChatWidget() {
   const [sessionDeleteModalVisible, setSessionDeleteModalVisible] =
     useState(false);
   const [newSessionName, setNewSessionName] = useState("");
-  const { sendMessage, isWaiting } = useWebSocket(
+  const { sendMessage, isWaiting } = useChatWebSocket(
     generalState.activeChatSessionId || "",
     (newMessage) => {
       setChatMessages((prevMessages) => {
@@ -140,12 +140,14 @@ export default function ChatWidget() {
       </div>
       {!generalState.activeChatSessionId && (
         <div className={styles.chat_room_list}>
-          <div className={styles.loading}>
-            {generalState.openedSessions.length === 0 && !loading && (
-              <Alert type="info">{t("chatWidget:no-chat-rooms")}</Alert>
-            )}
-            {loading && <Spinner size="large" />}
-          </div>
+          {(loading || generalState.openedSessions.length === 0) && (
+            <div className={styles.loading}>
+              {generalState.openedSessions.length === 0 && !loading && (
+                <Alert type="info">{t("chatWidget:no-chat-rooms")}</Alert>
+              )}
+              {loading && <Spinner size="large" />}
+            </div>
+          )}
           {generalState.openedSessions
             .sort(
               (a, b) =>

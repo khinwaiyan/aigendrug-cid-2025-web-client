@@ -13,3 +13,8 @@ export interface CreateChatMessageDTO {
   role: string;
   message: string;
 }
+
+export const CHAT_MESSAGE_TYPE_NORMAL = 0;
+export const CHAT_MESSAGE_TYPE_TOOL_SELECTION = 1;
+export const CHAT_MESSAGE_TYPE_TOOL_SUGGESTIONS = 2;
+export const CHAT_MESSAGE_TYPE_TOOL_FURTHER_INFO = 3;
