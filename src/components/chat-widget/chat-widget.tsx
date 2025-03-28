@@ -21,6 +21,7 @@ import { ChatUI } from "../chat-ui/chat-ui";
 import { ChatMessage } from "../../service/chat/interface";
 import { Avatar } from "@cloudscape-design/chat-components";
 import useWebSocket from "../../common/hooks/use-websocket";
+import { isOk, unwrapOr, unwrapOrThrow } from "../../service/service-wrapper";
 
 export default function ChatWidget() {
   const { generalState, updateGenerateState } = useGeneralContext();
@@ -51,7 +52,8 @@ export default function ChatWidget() {
   async function fetchData() {
     setLoading(true);
 
-    const sessions = await sessionService.getAllSessions();
+    const sessions = unwrapOr(await sessionService.getAllSessions(), []);
+
     updateGenerateState({ openedSessions: sessions });
 
     if (generalState.activeChatSessionId) {
@@ -62,8 +64,11 @@ export default function ChatWidget() {
       if (session) {
         setActiveSession(session);
 
-        const messages = await chatService.getChatMesssageBySessionId(
-          generalState.activeChatSessionId
+        const messages = unwrapOr(
+          await chatService.getChatMesssageBySessionId(
+            generalState.activeChatSessionId
+          ),
+          []
         );
 
         setChatMessages(messages);
@@ -261,8 +266,8 @@ export default function ChatWidget() {
                 variant="primary"
                 onClick={async () => {
                   setIsCreatingSession(true);
-                  const newSession = await sessionService.createSession(
-                    newSessionName
+                  const newSession = unwrapOrThrow(
+                    await sessionService.createSession(newSessionName)
                   );
                   setNewSessionModalVisible(false);
                   setNewSessionName("");
@@ -305,7 +310,10 @@ export default function ChatWidget() {
                 variant="primary"
                 onClick={async () => {
                   if (!selectedSessionId) return;
-                  await sessionService.deleteSession(selectedSessionId);
+                  const res = isOk(
+                    await sessionService.deleteSession(selectedSessionId)
+                  );
+                  if (!res) return;
                   setSessionDeleteModalVisible(false);
                   updateGenerateState({ activeChatSessionId: null });
                   fetchData();

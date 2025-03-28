@@ -7,6 +7,7 @@ import DashboardPage from "./pages/dashboard/dashboard-page";
 import ChatFab from "./components/chat-widget/chat-fab";
 import ChatWidget from "./components/chat-widget/chat-widget";
 import { GeneralProvider } from "./context/general-context";
+import ToolRegistrationPage from "./pages/tool-registration/tool-registration-page";
 
 export default function App() {
   const Router = USE_BROWSER_ROUTER ? BrowserRouter : HashRouter;
@@ -22,6 +23,10 @@ export default function App() {
           <div>
             <Routes>
               <Route index path="/" element={<DashboardPage />} />
+              <Route
+                path="/tool-registration"
+                element={<ToolRegistrationPage />}
+              />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>

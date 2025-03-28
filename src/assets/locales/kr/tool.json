@@ -1,0 +1,18 @@
+{
+  "registration": {
+    "title": "도구 등록"
+  },
+  "no-items": "항목 없음",
+  "no-items-description": "표시할 항목이 없습니다",
+  "upload-json": "JSON 업로드",
+  "table": {
+    "title": "도구",
+    "add-item": "도구 추가",
+    "delete": "삭제",
+    "column": {
+      "name": "이름",
+      "status": "상태",
+      "tool-id": "고유 ID"
+    }
+  }
+}

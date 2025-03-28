@@ -22,6 +22,11 @@ export default function NavigationPanel() {
       href: "/",
     },
     {
+      type: "link",
+      text: t("tool-registration"),
+      href: "/tool-registration",
+    },
+    {
       type: "section",
       text: t("tool-session"),
       items: [],

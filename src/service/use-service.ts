@@ -1,6 +1,7 @@
 import axios from "axios";
 import { ChatService } from "./chat/service";
 import { SessionService } from "./session/service";
+import { ToolService } from "./tool/service";
 
 export const useService = () => {
   const instance = axios.create({
@@ -29,5 +30,6 @@ export const useService = () => {
   return {
     sessionService: new SessionService(instance),
     chatService: new ChatService(instance),
+    toolService: new ToolService(instance),
   };
 };
