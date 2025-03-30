@@ -47,7 +47,7 @@ export default function useToolWebSocket(
     return () => {
       ws.close();
     };
-  }, [sessionID, onMessageReceived]);
+  }, [sessionID]);
 
   const sendMessage = (messageContent: CreateToolMessageDTO) => {
     if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {

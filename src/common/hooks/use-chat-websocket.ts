@@ -26,6 +26,7 @@ export default function useChatWebSocket(
 
     ws.onopen = () => {
       console.log(`Connected to WebSocket session: ${sessionID}`);
+
       setIsConnected(true);
     };
 
@@ -47,7 +48,7 @@ export default function useChatWebSocket(
     return () => {
       ws.close();
     };
-  }, [sessionID, onMessageReceived]);
+  }, [sessionID]);
 
   const sendMessage = (messageContent: CreateChatMessageDTO) => {
     if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
