@@ -17,6 +17,7 @@ import { useEffect, useState } from "react";
 import { Tool } from "../../service/tool/interface";
 import { unwrapOrThrow } from "../../service/service-wrapper";
 import { useGeneralContext } from "../../context/general-context";
+import { useOnFollow } from "../../common/hooks/use-on-follow";
 
 export interface ChatUIMessageProps {
   message: ChatMessage;
@@ -28,6 +29,7 @@ export default function ChatUIMessage(props: ChatUIMessageProps) {
   const { toolService } = useService();
   const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
   const { updateGenerateState } = useGeneralContext();
+  const onFollow = useOnFollow();
 
   useEffect(() => {
     if (props.message?.role !== "system") {
@@ -125,10 +127,12 @@ export default function ChatUIMessage(props: ChatUIMessageProps) {
       {props.message?.role === "system" && (
         <div className={styles.system_message}>
           <Button
+            onFollow={onFollow}
             loading={selectedTool === null}
             iconAlign="right"
             iconName="external"
             variant="primary"
+            href={selectedTool ? `/tool-input/${selectedTool.id}` : "#"}
             onClick={() => {
               updateGenerateState({
                 isChatWidgetOpen: false,
