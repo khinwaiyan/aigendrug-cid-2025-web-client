@@ -7,7 +7,7 @@ export const useService = () => {
   const instance = axios.create({
     baseURL: import.meta.env.PROD
       ? "https://api-aigendrug-cid-2025.luidium.com/v1"
-      : "http://localhost:8080/v1",
+      : `http://${import.meta.env.VITE_API_DOMAIN}/v1`,
     headers: {
       "Content-Type": "application/json",
     },
