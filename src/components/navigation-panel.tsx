@@ -32,11 +32,14 @@ export default function NavigationPanel() {
     {
       type: "section",
       text: t("tool-session"),
-      items: toolSessionLinks.map((link) => ({
-        type: "link",
-        text: `${link.toolName}(S-${link.sessionId.slice(0, 4)})`,
-        href: `/tool-input/${link.sessionId}/${link.toolId}`,
-      })),
+      items:
+        toolSessionLinks.length > 0
+          ? toolSessionLinks.map((link) => ({
+              type: "link",
+              text: `${link.toolName}(S-${link.sessionId.slice(0, 4)})`,
+              href: `/tool-input/${link.sessionId}/${link.toolId}`,
+            }))
+          : [],
     },
   ];
 

@@ -1,6 +1,6 @@
 @use "@cloudscape-design/design-tokens/index" as awsui;
 
-.tool_input_form_container {
+.tool_container {
   border: 1px solid awsui.$color-border-divider-default;
   border-radius: awsui.$border-radius-container;
   padding: 30px;
@@ -8,4 +8,9 @@
   flex-direction: column;
 
   max-width: 720px;
+}
+
+.tool_output_title {
+  font-size: awsui.$font-size-heading-l;
+  font-weight: awsui.$font-weight-heading-l;
 }

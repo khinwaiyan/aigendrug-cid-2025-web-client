@@ -115,8 +115,8 @@ export default function ToolInputPage() {
         <>
           {toolOutput ? (
             <ContentLayout header={<ToolOutputHeader />}>
-              <div className={styles.tool_output_container}>
-                <p>
+              <div className={styles.tool_container}>
+                <p className={styles.tool_output_title}>
                   {typeof toolOutput.result === "string" ||
                   typeof toolOutput.result === "number"
                     ? toolOutput.result
@@ -132,7 +132,7 @@ export default function ToolInputPage() {
                 {!tool ? (
                   <div>Loading tool...</div>
                 ) : (
-                  <div className={styles.tool_input_form_container}>
+                  <div className={styles.tool_container}>
                     <form
                       onSubmit={(e) => {
                         e.preventDefault();
