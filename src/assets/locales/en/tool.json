@@ -2,6 +2,14 @@
   "registration": {
     "title": "Tool Registration"
   },
+  "tool-input": {
+    "title": "Tool Input",
+    "run-model": "Run Model"
+  },
+  "tool-output": {
+    "title": "Tool Result",
+    "error": "Invalid output"
+  },
   "no-items": "No items",
   "no-items-description": "There are no items to display",
   "upload-json": "Upload JSON",

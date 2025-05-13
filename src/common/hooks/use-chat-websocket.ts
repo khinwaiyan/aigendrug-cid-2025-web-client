@@ -20,7 +20,9 @@ export default function useChatWebSocket(
     const ws = new WebSocket(
       import.meta.env.PROD
         ? `wss://api-aigendrug-cid-2025.luidium.com/v1/chat/session/ws?sessionID=${sessionID}`
-        : `ws://localhost:8080/v1/chat/session/ws?sessionID=${sessionID}`
+        : `ws://${
+            import.meta.env.VITE_API_DOMAIN
+          }/v1/chat/session/ws?sessionID=${sessionID}`
     );
     socketRef.current = ws;
 

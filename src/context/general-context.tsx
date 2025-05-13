@@ -12,6 +12,12 @@ export interface GeneralState {
   isChatWidgetOpen: boolean;
   isChatWidgetFullScreen: boolean;
   activeChatSessionId: string | null;
+  toolSessionLinks: ToolSessionLink[];
+}
+export interface ToolSessionLink {
+  sessionId: string;
+  toolId: string;
+  toolName: string;
 }
 
 const GeneralContext = createContext<GeneralContextType | undefined>(undefined);

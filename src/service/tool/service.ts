@@ -1,5 +1,5 @@
 import { AxiosInstance } from "axios";
-import { CreateToolDTO, Tool } from "./interface";
+import { CreateToolDTO, Tool, ToolInteractionElement } from "./interface";
 import { Result, wrapPromise } from "../service-wrapper";
 
 export class ToolService {
@@ -27,5 +27,16 @@ export class ToolService {
 
   async deleteTool(id: string): Promise<Result<void>> {
     return wrapPromise(this.instance.delete(`/tool/${id}`).then(() => {}));
+  }
+
+  async runTool(
+    id: string,
+    request: ToolInteractionElement[]
+  ): Promise<Result<string>> {
+    return wrapPromise(
+      this.instance
+        .post(`/tool/send_request/${id}`, request)
+        .then((res) => res.data)
+    );
   }
 }

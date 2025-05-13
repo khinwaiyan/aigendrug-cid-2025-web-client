@@ -17,6 +17,8 @@ import { useService } from "../../service/use-service";
 import { unwrapOr } from "../../service/service-wrapper";
 import { Tool } from "../../service/tool/interface";
 import ToolCreator from "./tool-creator";
+import ToolInputModal from "../tool-session/tool-input-modal";
+import { useGeneralContext } from "../../context/general-context";
 
 const sampleToolJson = `{
   "id": "00000000-0000-0000-0000-000000000000",
@@ -38,6 +40,9 @@ export default function ToolsTable() {
   const [toolDeleteModalVisible, setToolDeleteModalVisible] = useState(false);
   const [jsonFile, setJsonFile] = useState<File | null>(null);
   const [jsonContent, setJsonContent] = useState<string>(sampleToolJson);
+  const [toolInputModalVisible, setToolInputModalVisible] = useState(false);
+  const [selectedToolId, setSelectedToolId] = useState<string | null>(null);
+  const { generalState, updateGenerateState } = useGeneralContext();
 
   const ItemsColumnDefinitions = useMemo<TableProps.ColumnDefinition<Tool>[]>(
     () => [
@@ -48,12 +53,11 @@ export default function ToolsTable() {
         cell: (item) => (
           <Link
             external
-            // onClick={() => {
-            //   updateGenerateState({
-            //     isChatWidgetOpen: true,
-            //     activeChatSessionId: item.id,
-            //   });
-            // }}
+            onFollow={(e) => {
+              e.preventDefault();
+              setSelectedToolId(item.id);
+              setToolInputModalVisible(true);
+            }}
           >
             {item.name}
           </Link>
@@ -209,6 +213,13 @@ export default function ToolsTable() {
                   await Promise.all(
                     selectedItems.map((item) => toolService.deleteTool(item.id))
                   );
+                  const deletedToolIds = selectedItems.map((item) => item.id);
+
+                  updateGenerateState({
+                    toolSessionLinks: generalState.toolSessionLinks.filter(
+                      (link) => !deletedToolIds.includes(link.toolId)
+                    ),
+                  });
 
                   setSelectedItems([]);
                   await fetchTools();
@@ -226,6 +237,13 @@ export default function ToolsTable() {
           <p>{t("chatWidget:delete-chat-confirm")}</p>
         </TextContent>
       </Modal>
+      {toolInputModalVisible && selectedToolId && (
+        <ToolInputModal
+          toolInputModalVisible={toolInputModalVisible}
+          setToolInputModalVisible={setToolInputModalVisible}
+          toolId={selectedToolId}
+        />
+      )}
     </>
   );
 }
