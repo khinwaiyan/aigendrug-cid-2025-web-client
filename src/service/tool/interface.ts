@@ -75,3 +75,18 @@ export interface CreateToolMessageDTO {
   role: string;
   data: Record<string, unknown>;
 }
+
+export interface ToolInteractionElement {
+  content:
+    | string
+    | number
+    | boolean
+    | object
+    | File
+    | File[]
+    | string[]
+    | number[]
+    | boolean[]
+    | object[];
+  interface_id: string;
+}
