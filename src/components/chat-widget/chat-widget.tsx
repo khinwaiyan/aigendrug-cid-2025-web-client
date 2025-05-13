@@ -317,7 +317,12 @@ export default function ChatWidget() {
                   );
                   if (!res) return;
                   setSessionDeleteModalVisible(false);
-                  updateGenerateState({ activeChatSessionId: null });
+                  updateGenerateState({
+                    activeChatSessionId: null,
+                    toolSessionLinks: generalState.toolSessionLinks.filter(
+                      (link) => link.sessionId !== selectedSessionId
+                    ),
+                  });
                   fetchData();
                 }}
               >

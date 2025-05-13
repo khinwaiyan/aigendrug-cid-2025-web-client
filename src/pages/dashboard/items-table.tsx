@@ -157,11 +157,16 @@ export default function ItemsTable() {
                       sessionService.deleteSession(item.id)
                     )
                   );
-
-                  setSelectedItems([]);
+                  const deletedSessionIds = selectedItems.map(
+                    (item) => item.id
+                  );
                   updateGenerateState({
                     activeChatSessionId: null,
+                    toolSessionLinks: generalState.toolSessionLinks.filter(
+                      (link) => !deletedSessionIds.includes(link.sessionId)
+                    ),
                   });
+                  setSelectedItems([]);
                   await fetchSessions();
                   setSessionDeleteModalVisible(false);
                 }}

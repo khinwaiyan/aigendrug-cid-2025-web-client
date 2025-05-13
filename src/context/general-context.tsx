@@ -5,7 +5,6 @@ import { useGeneralState } from "../common/hooks/use-general-state";
 type GeneralContextType = {
   generalState: GeneralState;
   updateGenerateState: (state: Partial<GeneralState>) => void;
-  addToolSessionLink: (link: ToolSessionLink) => void;
 };
 
 export interface GeneralState {
@@ -31,17 +30,6 @@ export function GeneralProvider({ children }: { children: ReactNode }) {
         generalState: currentGeneralState,
         updateGenerateState: (state: Partial<GeneralState>) => {
           setCurrentGeneralState(state);
-        },
-        addToolSessionLink: (link: ToolSessionLink) => {
-          const existing = currentGeneralState.toolSessionLinks.find(
-            (l) => l.sessionId === link.sessionId && l.toolId === link.toolId
-          );
-          if (!existing) {
-            setCurrentGeneralState({
-              ...currentGeneralState,
-              toolSessionLinks: [...currentGeneralState.toolSessionLinks, link],
-            });
-          }
         },
       }}
     >
