@@ -7,6 +7,7 @@ import { useOnFollow } from "../common/hooks/use-on-follow";
 import { APP_NAME } from "../common/constants";
 import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { useGeneralContext } from "../context/general-context";
 
 export default function NavigationPanel() {
   const location = useLocation();
@@ -15,6 +16,8 @@ export default function NavigationPanel() {
   const [navigationPanelState, setNavigationPanelState] =
     useNavigationPanelState();
 
+  const { generalState } = useGeneralContext();
+  const toolSessionLinks = generalState.toolSessionLinks ?? [];
   const items: SideNavigationProps.Item[] = [
     {
       type: "link",
@@ -29,7 +32,11 @@ export default function NavigationPanel() {
     {
       type: "section",
       text: t("tool-session"),
-      items: [],
+      items: toolSessionLinks.map((link) => ({
+        type: "link",
+        text: `${link.toolName}(S-${link.sessionId.slice(0, 4)})`,
+        href: `/tool-input/${link.sessionId}/${link.toolId}`,
+      })),
     },
   ];
 
@@ -59,7 +66,6 @@ export default function NavigationPanel() {
             navigationPanelState.collapsedSections?.[idx] === true;
           value.defaultExpanded = !collapsed;
         }
-
         return value;
       })}
     />

@@ -28,7 +28,7 @@ export default function ChatUIMessage(props: ChatUIMessageProps) {
   const { t } = useTranslation();
   const { toolService } = useService();
   const [selectedTool, setSelectedTool] = useState<Tool | null>(null);
-  const { updateGenerateState } = useGeneralContext();
+  const { updateGenerateState, addToolSessionLink } = useGeneralContext();
   const onFollow = useOnFollow();
 
   useEffect(() => {
@@ -132,11 +132,23 @@ export default function ChatUIMessage(props: ChatUIMessageProps) {
             iconAlign="right"
             iconName="external"
             variant="primary"
-            href={selectedTool ? `/tool-input/${selectedTool.id}` : "#"}
+            href={
+              selectedTool
+                ? `/tool-input/${props.message.session_id}/${selectedTool.id}`
+                : "#"
+            }
             onClick={() => {
-              updateGenerateState({
-                isChatWidgetOpen: false,
-              });
+              if (selectedTool && props.message.session_id) {
+                addToolSessionLink({
+                  sessionId: props.message.session_id,
+                  toolId: selectedTool.id,
+                  toolName: selectedTool.name,
+                });
+
+                updateGenerateState({
+                  isChatWidgetOpen: false,
+                });
+              }
             }}
           >
             {selectedTool?.name}

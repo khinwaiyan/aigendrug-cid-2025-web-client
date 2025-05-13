@@ -25,13 +25,13 @@ export default function ToolInputPage() {
   const [formFiles, setFormFiles] = useState<Record<string, File[]>>({});
   const { toolService } = useService();
   const onFollow = useOnFollow();
-  const { id } = useParams();
+  const { toolId, sessionId } = useParams();
   useEffect(() => {
-    if (!id) {
+    if (!toolId) {
       return;
     }
     const fetch = async () => {
-      const tool = unwrapOrThrow(await toolService.getTool(id));
+      const tool = unwrapOrThrow(await toolService.getTool(toolId));
       setTool(tool);
     };
     fetch();
@@ -73,7 +73,7 @@ export default function ToolInputPage() {
             },
             {
               text: "Tool Input",
-              href: `/tool-input/${id}`,
+              href: `/tool-input/${sessionId}/${toolId}`,
             },
           ]}
         />

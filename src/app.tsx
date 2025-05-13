@@ -28,7 +28,10 @@ export default function App() {
                 path="/tool-registration"
                 element={<ToolRegistrationPage />}
               />
-              <Route path="/tool-input/:id" element={<ToolInputPage />} />
+              <Route
+                path="/tool-input/:sessionId/:toolId"
+                element={<ToolInputPage />}
+              />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
