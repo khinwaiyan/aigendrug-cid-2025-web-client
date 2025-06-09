@@ -15,6 +15,7 @@
     "@cloudscape-design/components": "^3.0.923",
     "@cloudscape-design/design-tokens": "^3.0.52",
     "@cloudscape-design/global-styles": "^1.0.38",
+    "@tailwindcss/postcss": "^4.1.7",
     "ace-builds": "^1.39.1",
     "axios": "^1.8.3",
     "i18next": "^24.2.3",
@@ -26,7 +27,8 @@
     "react-markdown": "^9.0.1",
     "react-router-dom": "^6.22.0",
     "react-textarea-autosize": "^8.5.3",
-    "remark-gfm": "^4.0.0"
+    "remark-gfm": "^4.0.0",
+    "tailwindcss": "^4.1.7"
   },
   "devDependencies": {
     "@types/react": "^18.2.55",
@@ -38,7 +40,7 @@
     "eslint": "^8.56.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
-    "postcss": "^8.4.35",
+    "postcss": "^8.5.3",
     "sass": "^1.70.0",
     "typescript": "^5.2.2",
     "vite": "^5.4.8"

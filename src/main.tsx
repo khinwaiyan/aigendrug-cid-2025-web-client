@@ -4,6 +4,7 @@ import { StorageHelper } from "./common/helpers/storage-helper";
 import App from "./app";
 import "./i18n";
 import "@cloudscape-design/global-styles/index.css";
+import "./index.css";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
