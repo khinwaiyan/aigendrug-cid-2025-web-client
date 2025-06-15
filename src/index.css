@@ -119,6 +119,9 @@
   * {
     @apply border-border outline-ring/50;
   }
+  button {
+    @apply border-0 outline-none bg-transparent;
+  }
   body {
     @apply bg-background text-foreground;
     @apply font-pretendard;

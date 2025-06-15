@@ -15,6 +15,7 @@
     "@cloudscape-design/components": "^3.0.923",
     "@cloudscape-design/design-tokens": "^3.0.52",
     "@cloudscape-design/global-styles": "^1.0.38",
+    "@radix-ui/react-dropdown-menu": "^2.1.15",
     "@radix-ui/react-slot": "^1.2.3",
     "@tailwindcss/postcss": "^4.1.7",
     "ace-builds": "^1.39.1",
