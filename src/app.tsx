@@ -7,6 +7,7 @@ import ChatFab from "./components/chat-widget/chat-fab";
 import ChatWidget from "./components/chat-widget/chat-widget";
 import { GeneralProvider } from "./context/general-context";
 import ToolRegistrationPage from "./pages/tool-registration/tool-registration-page";
+import ToolSessionPage from "./pages/tool-session/tool-session-page";
 import ToolInputPage from "./pages/tool-session/tool-input-page";
 
 export default function App() {
@@ -22,6 +23,7 @@ export default function App() {
               path="/tool-registration"
               element={<ToolRegistrationPage />}
             />
+            <Route path="/tool-session" element={<ToolSessionPage />} />
             <Route
               path="/tool-input/:sessionId/:toolId"
               element={<ToolInputPage />}

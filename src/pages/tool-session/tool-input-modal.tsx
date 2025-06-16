@@ -86,6 +86,7 @@ export default function ToolInputModal({
               onClick={() => {
                 handleSubmit();
                 setToolInputModalVisible(false);
+                window.location.href = `/tool-session`;
               }}
             >
               {t("tool-input.run-model")}

@@ -2,6 +2,9 @@
   "registration": {
     "title": "도구 등록"
   },
+  "session": {
+    "title": "도구 세션"
+  },
   "tool-input": {
     "title": "도구 입력",
     "run-model": "모델 실행"
