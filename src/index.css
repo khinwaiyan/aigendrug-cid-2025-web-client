@@ -125,6 +125,6 @@
   body {
     @apply bg-background text-foreground;
     @apply font-pretendard;
-    @apply text-sm font-medium leading-5;
+    @apply text-[16px] font-medium leading-5;
   }
 }

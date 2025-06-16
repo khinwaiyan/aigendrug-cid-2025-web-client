@@ -1,6 +1,5 @@
 import { HashRouter, BrowserRouter, Routes, Route } from "react-router-dom";
 import { USE_BROWSER_ROUTER } from "./common/constants";
-import { GlobalHeader } from "./components/global-header";
 import NotFound from "./pages/not-found";
 import "./styles/app.scss";
 import DashboardPage from "./pages/dashboard/dashboard-page";
@@ -9,17 +8,17 @@ import ChatWidget from "./components/chat-widget/chat-widget";
 import { GeneralProvider } from "./context/general-context";
 import ToolRegistrationPage from "./pages/tool-registration/tool-registration-page";
 import ToolInputPage from "./pages/tool-session/tool-input-page";
+import { BaseLayout } from "./components/base-layout";
 
 export default function App() {
   const Router = USE_BROWSER_ROUTER ? BrowserRouter : HashRouter;
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="h-screen flex flex-col overflow-hidden">
       <Router>
         <GeneralProvider>
-          <GlobalHeader />
-          <div className="pt-16">
-            <Routes>
+          <Routes>
+            <Route element={<BaseLayout />}>
               <Route index path="/" element={<DashboardPage />} />
               <Route
                 path="/tool-registration"
@@ -29,9 +28,9 @@ export default function App() {
                 path="/tool-input/:sessionId/:toolId"
                 element={<ToolInputPage />}
               />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </div>
+            </Route>
+            <Route path="*" element={<NotFound />} />
+          </Routes>
           <ChatFab />
           <ChatWidget />
         </GeneralProvider>
