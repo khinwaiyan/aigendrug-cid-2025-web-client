@@ -1,27 +1,34 @@
 import { useTranslation } from "react-i18next";
 import { useGeneralContext } from "../../context/general-context";
 import styles from "../../styles/chat-widget.module.scss";
+import { Alert, Header, Spinner } from "@cloudscape-design/components";
 import {
-  Alert,
-  Box,
-  Button,
-  ButtonGroup,
-  FormField,
-  Header,
-  Input,
-  Modal,
-  SpaceBetween,
-  Spinner,
-  TextContent,
-} from "@cloudscape-design/components";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+} from "../../components/ui/dialog";
+import { Input } from "../../components/ui/input";
+import { Button } from "../ui/button";
+
 import { useEffect, useState } from "react";
 import { useService } from "../../service/use-service";
 import { Session } from "../../service/session/interface";
 import { ChatUI } from "../chat-ui/chat-ui";
 import { ChatMessage } from "../../service/chat/interface";
-import { Avatar } from "@cloudscape-design/chat-components";
 import useChatWebSocket from "../../common/hooks/use-chat-websocket";
 import { isOk, unwrapOr, unwrapOrThrow } from "../../service/service-wrapper";
+import {
+  ChevronLeft,
+  Maximize2,
+  MessageSquareMore,
+  Minimize2,
+  Minus,
+  Plus,
+  Trash,
+} from "lucide-react";
 
 export default function ChatWidget() {
   const { generalState, updateGenerateState } = useGeneralContext();
@@ -96,46 +103,54 @@ export default function ChatWidget() {
           actions={
             !generalState.activeChatSessionId ? (
               <Button
-                variant="normal"
-                iconName="add-plus"
+                variant="default"
                 onClick={() => setNewSessionModalVisible(true)}
               >
+                <Plus />
                 {t("chatWidget:new-chat")}
               </Button>
             ) : (
               <>
                 <Button
-                  variant="icon"
-                  iconName="angle-left"
+                  variant="ghost"
                   onClick={() => {
                     updateGenerateState({ activeChatSessionId: null });
                     setActiveSession(null);
                     setChatMessages([]);
                   }}
-                />
-                <TextContent>
-                  <h3>{activeSession?.name}</h3>
-                </TextContent>
+                >
+                  <ChevronLeft />
+                  <h3 className="text-lg font-semibold">
+                    {activeSession?.name}
+                  </h3>
+                </Button>
               </>
             )
           }
         >
           <Button
-            variant="icon"
-            iconName={generalState.isChatWidgetFullScreen ? "shrink" : "expand"}
+            variant="ghost"
+            size="icon"
             onClick={() =>
               updateGenerateState({
                 isChatWidgetFullScreen: !generalState.isChatWidgetFullScreen,
               })
             }
-          />
+          >
+            {generalState.isChatWidgetFullScreen ? (
+              <Minimize2 className="w-4 h-4" />
+            ) : (
+              <Maximize2 className="w-4 h-4" />
+            )}
+          </Button>
           <Button
-            variant="icon"
-            iconName="subtract-minus"
+            variant="ghost"
             onClick={() => {
               updateGenerateState({ isChatWidgetOpen: false });
             }}
-          />
+          >
+            <Minus size={4} />
+          </Button>
         </Header>
       </div>
       {!generalState.activeChatSessionId && (
@@ -165,18 +180,14 @@ export default function ChatWidget() {
                   fetchData();
                 }}
               >
-                <div className={styles.avatar}>
-                  <Avatar ariaLabel="avatar" iconName="contact" />
+                <div>
+                  <MessageSquareMore />
                 </div>
-                <div className={styles.info}>
-                  <TextContent>
+                <div>
+                  <div className=" font-semibold">
                     <h4>{chatRoom.name}</h4>
-                    <p>
-                      <small>
-                        {new Date(chatRoom.created_at).toLocaleString()}
-                      </small>
-                    </p>
-                  </TextContent>
+                    <p>{new Date(chatRoom.created_at).toLocaleString()}</p>
+                  </div>
                 </div>
                 <div className={styles.spacer} />
                 <div
@@ -185,35 +196,17 @@ export default function ChatWidget() {
                     e.stopPropagation();
                   }}
                 >
-                  <ButtonGroup
-                    onItemClick={({ detail }) => {
-                      if (detail.id === "remove") {
-                        setSelectedSessionId(chatRoom.id);
-                        setSessionDeleteModalVisible(true);
-                      }
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedSessionId(chatRoom.id);
+                      setSessionDeleteModalVisible(true);
                     }}
-                    ariaLabel="Chat actions"
-                    items={[
-                      // {
-                      //   type: "icon-button",
-                      //   id: "copy",
-                      //   iconName: "copy",
-                      //   text: "Copy",
-                      //   popoverFeedback: (
-                      //     <StatusIndicator type="success">
-                      //       Message copied
-                      //     </StatusIndicator>
-                      //   ),
-                      // },
-                      {
-                        type: "icon-button",
-                        id: "remove",
-                        iconName: "remove",
-                        text: t("base:delete"),
-                      },
-                    ]}
-                    variant="icon"
-                  />
+                  >
+                    <Trash className="w-4 h-4" />
+                  </Button>
                 </div>
               </div>
             ))}
@@ -237,106 +230,97 @@ export default function ChatWidget() {
           />
         )}
       </div>
-      <Modal
-        onDismiss={() => {
-          if (!isCreatingSession) {
-            setNewSessionModalVisible(false);
-            setNewSessionName("");
-          }
-        }}
-        visible={newSessionModalVisible}
-        footer={
-          <Box float="right">
-            <SpaceBetween direction="horizontal" size="xs">
-              <Button
-                variant="link"
-                disabled={isCreatingSession}
-                onClick={() => {
-                  setNewSessionModalVisible(false);
-                  setNewSessionName("");
-                }}
-              >
-                {t("base:cancel")}
-              </Button>
-              <Button
-                disabled={
-                  newSessionName === "" ||
-                  newSessionName.length < 3 ||
-                  newSessionName.length > 25
-                }
-                loading={isCreatingSession}
-                variant="primary"
-                onClick={async () => {
-                  setIsCreatingSession(true);
-                  const newSession = unwrapOrThrow(
-                    await sessionService.createSession(newSessionName)
-                  );
-                  setNewSessionModalVisible(false);
-                  setNewSessionName("");
-                  fetchData();
-                  updateGenerateState({ activeChatSessionId: newSession.id });
-                  setIsCreatingSession(false);
-                }}
-              >
-                {t("base:ok")}
-              </Button>
-            </SpaceBetween>
-          </Box>
-        }
-        header={t("chatWidget:new-chat")}
+      <Dialog
+        open={newSessionModalVisible}
+        onOpenChange={setNewSessionModalVisible}
       >
-        <FormField
-          label={t("chatWidget:input-new-chat-name")}
-          description=""
-          errorText=""
-        >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("chatWidget:new-chat")}</DialogTitle>
+            <DialogDescription>
+              {t("chatWidget:input-new-chat-name")}
+            </DialogDescription>
+          </DialogHeader>
           <Input
             value={newSessionName}
-            onChange={({ detail }) => setNewSessionName(detail.value)}
+            onChange={(e) =>
+              setNewSessionName((e.target as HTMLInputElement).value)
+            }
+            placeholder={t("chatWidget:input-new-chat-name")}
           />
-        </FormField>
-      </Modal>
-      <Modal
-        onDismiss={() => setSessionDeleteModalVisible(false)}
-        visible={sessionDeleteModalVisible}
-        footer={
-          <Box float="right">
-            <SpaceBetween direction="horizontal" size="xs">
-              <Button
-                variant="link"
-                onClick={() => setSessionDeleteModalVisible(false)}
-              >
-                {t("base:cancel")}
-              </Button>
-              <Button
-                variant="primary"
-                onClick={async () => {
-                  if (!selectedSessionId) return;
-                  const res = isOk(
-                    await sessionService.deleteSession(selectedSessionId)
-                  );
-                  if (!res) return;
-                  setSessionDeleteModalVisible(false);
-                  updateGenerateState({
-                    activeChatSessionId: null,
-                    toolSessionLinks: generalState.toolSessionLinks.filter(
-                      (link) => link.sessionId !== selectedSessionId
-                    ),
-                  });
-                  fetchData();
-                }}
-              >
-                {t("base:delete")}
-              </Button>
-            </SpaceBetween>
-          </Box>
-        }
-        header={t("chatWidget:delete-chat")}
+          <DialogFooter>
+            <Button
+              variant="ghost"
+              disabled={isCreatingSession}
+              onClick={() => {
+                setNewSessionModalVisible(false);
+                setNewSessionName("");
+              }}
+            >
+              {t("base:cancel")}
+            </Button>
+            <Button
+              variant="default"
+              disabled={newSessionName.length < 3 || newSessionName.length > 25}
+              onClick={async () => {
+                setIsCreatingSession(true);
+                const newSession = unwrapOrThrow(
+                  await sessionService.createSession(newSessionName)
+                );
+                setNewSessionModalVisible(false);
+                setNewSessionName("");
+                fetchData();
+                updateGenerateState({ activeChatSessionId: newSession.id });
+                setIsCreatingSession(false);
+              }}
+            >
+              {t("base:ok")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={sessionDeleteModalVisible}
+        onOpenChange={setSessionDeleteModalVisible}
       >
-        <TextContent>
-          <p>{t("chatWidget:delete-chat-confirm")}</p>
-        </TextContent>
-      </Modal>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("chatWidget:delete-chat")}</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            {t("chatWidget:delete-chat-confirm")}
+          </p>
+          <DialogFooter>
+            <Button
+              variant="ghost"
+              onClick={() => setSessionDeleteModalVisible(false)}
+            >
+              {t("base:cancel")}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={async () => {
+                if (!selectedSessionId) return;
+                const res = isOk(
+                  await sessionService.deleteSession(selectedSessionId)
+                );
+                if (!res) return;
+                setSessionDeleteModalVisible(false);
+                updateGenerateState({
+                  activeChatSessionId: null,
+                  toolSessionLinks: generalState.toolSessionLinks.filter(
+                    (link) => link.sessionId !== selectedSessionId
+                  ),
+                });
+                fetchData();
+              }}
+            >
+              {t("base:delete")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
