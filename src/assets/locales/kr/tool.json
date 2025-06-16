@@ -21,6 +21,11 @@
       "name": "이름",
       "status": "상태",
       "tool-id": "고유 ID"
+    },
+    "actions": {
+      "open-menu": "메뉴 열기",
+      "copy-tool-id": "툴 ID 복사",
+      "delete-session": "세션 삭제"
     }
   }
 }

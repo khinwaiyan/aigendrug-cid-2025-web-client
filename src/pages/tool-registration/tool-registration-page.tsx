@@ -1,41 +1,27 @@
 import { APP_NAME } from "../../common/constants";
-import {
-  BreadcrumbGroup,
-  ContentLayout,
-  SpaceBetween,
-} from "@cloudscape-design/components";
-import { useOnFollow } from "../../common/hooks/use-on-follow";
-import BaseAppLayout from "../../components/base-app-layout";
+
+import { BaseLayout } from "../../components/base-layout";
 import ToolRegistrationHeader from "./tool-registration-header";
-import ToolsTable from "./tools-table";
+import ToolsTable from "./data-table";
 
 export default function ToolRegistrationPage() {
-  const onFollow = useOnFollow();
-
   return (
-    <BaseAppLayout
-      breadcrumbs={
-        <BreadcrumbGroup
-          onFollow={onFollow}
-          items={[
-            {
-              text: APP_NAME,
-              href: "/",
-            },
-            {
-              text: "Tool Registration",
-              href: "/tool-registration",
-            },
-          ]}
-        />
-      }
-      content={
-        <ContentLayout header={<ToolRegistrationHeader />}>
-          <SpaceBetween size="l">
-            <ToolsTable />
-          </SpaceBetween>
-        </ContentLayout>
-      }
-    />
+    <BaseLayout
+      breadcrumbs={[
+        {
+          text: APP_NAME,
+          href: "/",
+        },
+        {
+          text: "Tool Registration",
+          href: "/tool-registration",
+        },
+      ]}
+    >
+      <ToolRegistrationHeader />
+      <div className="space-y-6">
+        <ToolsTable />
+      </div>
+    </BaseLayout>
   );
 }
