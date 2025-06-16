@@ -51,8 +51,8 @@ export const NavigationPanel = () => {
 
   return (
     <Sidebar className="fixed top-16 left-0 h-[calc(100vh-64px)] bg-background border-r z-40 overflow-y-auto">
-      <SidebarHeader>
-        <div className="p-1 text-lg font-bold">{APP_NAME}</div>
+      <SidebarHeader className=" font-bold flex h-16 justify-center border-b px-4">
+        {APP_NAME}
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>

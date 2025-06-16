@@ -16,6 +16,11 @@
       "name": "Name",
       "status": "Status",
       "assigned-tool": "Assigned Tool"
+    },
+    "actions": {
+      "open-menu": "Open Menu",
+      "copy-tool-id": "Copy Tool ID",
+      "delete-session": "Delete Session"
     }
   }
 }
