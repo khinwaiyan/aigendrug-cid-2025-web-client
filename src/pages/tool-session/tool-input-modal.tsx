@@ -9,9 +9,9 @@ import {
 } from "@cloudscape-design/components";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { unwrapOrThrow } from "../../service/service-wrapper";
+import { isOk, unwrapOrThrow } from "../../service/service-wrapper";
 import { useService } from "../../service/use-service";
-import { Tool } from "../../service/tool/interface";
+import { Tool, ToolInteractionElement } from "../../service/tool/interface";
 import styles from "../../styles/tool.module.scss";
 
 type ToolInputModalProps = {
@@ -59,13 +59,39 @@ export default function ToolInputModal({
     }
   };
 
-  const handleSubmit = () => {
-    console.log("Submitted form values:", {
-      ...formTexts,
-      ...formNumbers,
-      ...formFiles,
+  const handleSubmit = async () => {
+    if (!tool) return;
+
+    const request = tool.provider_interface.requestInterface.map((field) => {
+      const key = field.key;
+      let value: ToolInteractionElement["content"] = "";
+
+      if (field.valueType === "string") {
+        value = formTexts[key] ?? "";
+      } else if (field.valueType === "number") {
+        value = formNumbers[key] ?? 0;
+      } else if (field.valueType === "file") {
+        value = formFiles[key] ?? [];
+      }
+
+      return {
+        content: value,
+        interface_id: field.id,
+      };
     });
-    // TODO: send to backend
+
+    const result = await toolService.runTool(tool.id, request); // correct the result type which includes status
+    // TODO: route to tool session page and add the tool request to the session
+    if (isOk(result)) {
+      console.log("Tool request submitted successfully:", result.data);
+      // TODO: route to tool session page
+
+      setFormTexts({});
+      setFormNumbers({});
+      setFormFiles({});
+    } else {
+      console.error("Error running tool:", result.error);
+    }
   };
   return (
     <Modal

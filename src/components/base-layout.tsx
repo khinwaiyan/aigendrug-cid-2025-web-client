@@ -24,7 +24,7 @@ export const BaseLayout = ({ children, breadcrumbs }: BaseLayoutProps) => {
       <SidebarProvider>
         <NavigationPanel />
         <main className="pt-16 p-4 w-full">
-          <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
+          <header className="flex h-16 shrink-0 items-center gap-2 border-b">
             <SidebarTrigger />
             <Separator
               orientation="vertical"

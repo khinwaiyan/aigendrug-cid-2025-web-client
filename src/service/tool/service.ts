@@ -39,4 +39,17 @@ export class ToolService {
         .then((res) => res.data)
     );
   }
+
+  // TODO: check implementation to fetch tool output
+  async getToolOutput(id: string): Promise<Result<string>> {
+    return wrapPromise(
+      this.instance.get(`/tool/get_output/${id}`).then((res) => res.data)
+    );
+  }
+  // TODO: getToolRequest => keep polling until the request is not pending
+  async getToolRequest(id: string): Promise<Result<ToolInteractionElement[]>> {
+    return wrapPromise(
+      this.instance.get(`/tool/get_request/${id}`).then((res) => res.data)
+    );
+  }
 }

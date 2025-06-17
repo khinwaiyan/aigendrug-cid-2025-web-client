@@ -11,7 +11,7 @@ import { Input } from "../../components/ui/input";
 import { Skeleton } from "../../components/ui/skeleton";
 import { useService } from "../../service/use-service";
 import { unwrapOr } from "../../service/service-wrapper";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Tool } from "../../service/tool/interface";
 import { ColumnDef } from "@tanstack/react-table";
 import { useTranslation } from "react-i18next";
@@ -39,6 +39,18 @@ export default function ToolsTable() {
   const [jsonContent, setJsonContent] = useState("");
   const [, setJsonFile] = useState<File | null>(null);
   const { generalState, updateGenerateState } = useGeneralContext();
+  const columnName = t("table.column.name");
+  const columnToolId = t("table.column.tool-id");
+  const actionCopyToolId = t("table.actions.copy-tool-id");
+  const actionDeleteSession = t("table.actions.delete-session");
+  const actionOpenMenu = t("table.actions.open-menu");
+
+  const fetchTools = useCallback(async () => {
+    setLoading(true);
+    const fetched = unwrapOr(await toolService.getAllTools(), []);
+    setTools(fetched);
+    setLoading(false);
+  }, [toolService]);
 
   const columns: ColumnDef<Tool>[] = useMemo(
     () => [
@@ -68,24 +80,20 @@ export default function ToolsTable() {
       },
       {
         accessorKey: "name",
-        header: ({ column }) => {
-          return (
-            <Button
-              variant="ghost"
-              onClick={() =>
-                column.toggleSorting(column.getIsSorted() === "asc")
-              }
-            >
-              {t("table.column.name")}
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-          );
-        },
+        header: ({ column }) => (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            {columnName}
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        ),
         cell: ({ row }) => row.original.name,
       },
       {
         accessorKey: "id",
-        header: t("table.column.tool-id"),
+        header: columnToolId,
       },
       {
         id: "actions",
@@ -96,9 +104,7 @@ export default function ToolsTable() {
             <DropdownMenu>
               <DropdownMenuTrigger>
                 <Button variant="ghost" className="h-8 w-8 p-0">
-                  <span className="sr-only">
-                    {t("table.actions.open-menu")}
-                  </span>
+                  <span className="sr-only">{actionOpenMenu}</span>
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -106,7 +112,7 @@ export default function ToolsTable() {
                 <DropdownMenuItem
                   onClick={() => navigator.clipboard.writeText(tool.id)}
                 >
-                  {t("table.actions.copy-tool-id")}
+                  {actionCopyToolId}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
@@ -122,7 +128,7 @@ export default function ToolsTable() {
                     await fetchTools();
                   }}
                 >
-                  {t("table.actions.delete-session")}
+                  {actionDeleteSession}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -130,15 +136,19 @@ export default function ToolsTable() {
         },
       },
     ],
-    [t]
+    [
+      columnName,
+      columnToolId,
+      actionCopyToolId,
+      actionDeleteSession,
+      actionOpenMenu,
+      selectedItems,
+      toolService,
+      updateGenerateState,
+      generalState.toolSessionLinks,
+      fetchTools,
+    ]
   );
-
-  const fetchTools = async () => {
-    setLoading(true);
-    const fetched = unwrapOr(await toolService.getAllTools(), []);
-    setTools(fetched);
-    setLoading(false);
-  };
 
   useEffect(() => {
     fetchTools();
@@ -185,7 +195,6 @@ export default function ToolsTable() {
           <DialogHeader>
             <DialogTitle>{t("table.add-item")}</DialogTitle>
           </DialogHeader>
-
           <div className="flex items-center justify-between mb-2">
             <label
               htmlFor="json-upload"
@@ -206,9 +215,7 @@ export default function ToolsTable() {
               }}
             />
           </div>
-
           <ToolCreator content={jsonContent} setContent={setJsonContent} />
-
           <DialogFooter>
             <Button
               variant="ghost"

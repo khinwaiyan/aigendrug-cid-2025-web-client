@@ -50,6 +50,7 @@ export interface Tool {
   description: string;
   created_at: string;
   provider_interface: ToolProviderInterface;
+  // status: string; // e.g., "pending", "success", "failed"
 }
 
 export interface CreateToolDTO {

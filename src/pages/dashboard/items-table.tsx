@@ -1,6 +1,6 @@
 import { useGeneralContext } from "../../context/general-context";
 import { Session } from "../../service/session/interface";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useService } from "../../service/use-service";
 import { unwrapOr } from "../../service/service-wrapper";
@@ -35,17 +35,29 @@ import { Skeleton } from "../../components/ui/skeleton";
 
 export default function ItemsTable() {
   const { t } = useTranslation(["dashboard", "base", "chatWidget"]);
-  const { sessionService } = useService();
+  const { sessionService, toolService } = useService();
   const { generalState, updateGenerateState } = useGeneralContext();
-  const [rowSelection, setRowSelection] = useState({});
 
-  const [loading, setLoading] = useState(false);
+  const [rowSelection, setRowSelection] = useState({});
   const [selectedItems, setSelectedItems] = useState<Session[]>([]);
   const [sessionDeleteModalVisible, setSessionDeleteModalVisible] =
     useState(false);
-  const { toolService } = useService();
-
   const [toolCount, setToolCount] = useState<number | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const fetchSessions = useCallback(async () => {
+    setLoading(true);
+    const sessions = unwrapOr(await sessionService.getAllSessions(), []);
+    updateGenerateState({ openedSessions: sessions });
+    setLoading(false);
+  }, [sessionService, updateGenerateState]);
+
+  useEffect(() => {
+    (async () => {
+      const tools = unwrapOr(await toolService.getAllTools(), []);
+      setToolCount(tools.length);
+    })();
+  }, [toolService]);
 
   const columns: ColumnDef<Session>[] = useMemo(
     () => [
@@ -75,28 +87,24 @@ export default function ItemsTable() {
       },
       {
         accessorKey: "name",
-        header: ({ column }) => {
-          return (
-            <Button
-              variant="ghost"
-              onClick={() =>
-                column.toggleSorting(column.getIsSorted() === "asc")
-              }
-            >
-              {t("table.column.name")}
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-          );
-        },
+        header: ({ column }) => (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            {t("table.column.name")}
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        ),
         cell: ({ row }) => (
           <Button
             variant="link"
-            onClick={() => {
+            onClick={() =>
               updateGenerateState({
                 isChatWidgetOpen: true,
                 activeChatSessionId: row.original.id,
-              });
-            }}
+              })
+            }
           >
             {row.original.name}
           </Button>
@@ -123,13 +131,13 @@ export default function ItemsTable() {
       },
       {
         accessorKey: "assigned_tool_id",
-        header: "Assigned Tool ID",
+        header: t("table.column.assigned-tool"),
+        cell: ({ row }) => row.original.assigned_tool_id || "-",
       },
       {
         id: "actions",
         cell: ({ row }) => {
           const session = row.original;
-
           return (
             <DropdownMenu>
               <DropdownMenuTrigger>
@@ -152,13 +160,11 @@ export default function ItemsTable() {
                 <DropdownMenuItem
                   onClick={async () => {
                     await sessionService.deleteSession(session.id);
-                    const deletedSessionIds = selectedItems.map(
-                      (item) => item.id
-                    );
+                    const deletedIds = selectedItems.map((item) => item.id);
                     updateGenerateState({
                       activeChatSessionId: null,
                       toolSessionLinks: generalState.toolSessionLinks.filter(
-                        (link) => !deletedSessionIds.includes(link.sessionId)
+                        (link) => !deletedIds.includes(link.sessionId)
                       ),
                     });
                     await fetchSessions();
@@ -172,22 +178,15 @@ export default function ItemsTable() {
         },
       },
     ],
-    [t]
+    [
+      t,
+      selectedItems,
+      sessionService,
+      updateGenerateState,
+      generalState.toolSessionLinks,
+      fetchSessions,
+    ]
   );
-
-  useEffect(() => {
-    async function fetch() {
-      setToolCount(unwrapOr(await toolService.getAllTools(), []).length);
-    }
-
-    fetch();
-  }, []);
-  async function fetchSessions() {
-    setLoading(true);
-    const sessions = unwrapOr(await sessionService.getAllSessions(), []);
-    updateGenerateState({ openedSessions: sessions });
-    setLoading(false);
-  }
 
   return (
     <div className="flex flex-col gap-4">
@@ -214,44 +213,34 @@ export default function ItemsTable() {
         </div>
       </div>
 
-      <div className="flex items-center justify-end gap-4">
+      <div className="flex justify-end gap-2">
         <Button
           variant="outline"
           size="sm"
-          onClick={() => {
+          onClick={() =>
             updateGenerateState({
               isChatWidgetOpen: true,
               activeChatSessionId: null,
-            });
-          }}
+            })
+          }
         >
           <Plus />
-          <span className="hidden lg:inline"> {t("table.add-item")}</span>
+          <span className="hidden lg:inline">{t("table.add-item")}</span>
         </Button>
         <Button
           variant="outline"
           size="sm"
           disabled={selectedItems.length === 0}
-          onClick={() => {
-            setSessionDeleteModalVisible(true);
-          }}
+          onClick={() => setSessionDeleteModalVisible(true)}
         >
           <Minus />
-          <span className="hidden lg:inline"> {t("table.delete")}</span>
+          <span className="hidden lg:inline">{t("table.delete")}</span>
         </Button>
       </div>
+
+      {/* Table or Skeleton */}
       {loading ? (
-        <div className="rounded-md border divide-y">
-          {Array.from({ length: 5 }).map((_, idx) => (
-            <div key={idx} className="grid grid-cols-5 gap-4 p-4 items-center">
-              <Skeleton className="h-4 w-4 rounded" /> {/* checkbox */}
-              <Skeleton className="h-4 w-32 col-span-1" /> {/* name */}
-              <Skeleton className="h-4 w-24 col-span-1" /> {/* status */}
-              <Skeleton className="h-4 w-32 col-span-2" /> {/* assigned tool */}
-              <Skeleton className="h-4 w-6 justify-self-end" /> {/* actions */}
-            </div>
-          ))}
-        </div>
+        <Skeleton className="h-48 w-full rounded-md" />
       ) : (
         <DataTable
           columns={columns}
@@ -260,11 +249,10 @@ export default function ItemsTable() {
           )}
           rowSelection={rowSelection}
           setRowSelection={setRowSelection}
-          onSelectedRowsChange={(selected) => setSelectedItems(selected)}
+          onSelectedRowsChange={setSelectedItems}
         />
       )}
 
-      {/* Session Delete Dialog */}
       <Dialog
         open={sessionDeleteModalVisible}
         onOpenChange={setSessionDeleteModalVisible}
@@ -273,11 +261,9 @@ export default function ItemsTable() {
           <DialogHeader>
             <DialogTitle>{t("chatWidget:delete-chat")}</DialogTitle>
           </DialogHeader>
-
-          <div className="space-y-2 text-sm text-muted-foreground">
-            <p>{t("chatWidget:delete-chat-confirm")}</p>
-          </div>
-
+          <p className="text-sm text-muted-foreground">
+            {t("chatWidget:delete-chat-confirm")}
+          </p>
           <DialogFooter>
             <Button
               variant="ghost"
@@ -293,11 +279,11 @@ export default function ItemsTable() {
                     sessionService.deleteSession(item.id)
                   )
                 );
-                const deletedSessionIds = selectedItems.map((item) => item.id);
+                const deletedIds = selectedItems.map((item) => item.id);
                 updateGenerateState({
                   activeChatSessionId: null,
                   toolSessionLinks: generalState.toolSessionLinks.filter(
-                    (link) => !deletedSessionIds.includes(link.sessionId)
+                    (link) => !deletedIds.includes(link.sessionId)
                   ),
                 });
                 setSelectedItems([]);
