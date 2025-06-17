@@ -23,7 +23,8 @@
     "column": {
       "name": "Name",
       "status": "Status",
-      "tool-id": "Tool ID"
+      "tool-id": "Tool ID",
+      "created-at": "Created At"
     },
     "actions": {
       "open-menu": "Open Menu",

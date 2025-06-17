@@ -1,5 +1,10 @@
 import { AxiosInstance } from "axios";
-import { CreateToolDTO, Tool, ToolInteractionElement } from "./interface";
+import {
+  CreateToolDTO,
+  ReadToolRequestDTO,
+  Tool,
+  ToolInteractionElement,
+} from "./interface";
 import { Result, wrapPromise } from "../service-wrapper";
 
 export class ToolService {
@@ -40,16 +45,10 @@ export class ToolService {
     );
   }
 
-  // TODO: check implementation to fetch tool output
-  async getToolOutput(id: string): Promise<Result<string>> {
+  // TODO: getToolRequestList => keep polling until all the request is not pending
+  async getToolRequestList(): Promise<Result<ReadToolRequestDTO[]>> {
     return wrapPromise(
-      this.instance.get(`/tool/get_output/${id}`).then((res) => res.data)
-    );
-  }
-  // TODO: getToolRequest => keep polling until the request is not pending
-  async getToolRequest(id: string): Promise<Result<ToolInteractionElement[]>> {
-    return wrapPromise(
-      this.instance.get(`/tool/get_request/${id}`).then((res) => res.data)
+      this.instance.get("tool/request-list").then((res) => res.data)
     );
   }
 }

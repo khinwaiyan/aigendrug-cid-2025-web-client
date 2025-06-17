@@ -23,7 +23,8 @@
     "column": {
       "name": "이름",
       "status": "상태",
-      "tool-id": "고유 ID"
+      "tool-id": "고유 ID",
+      "created-at": "생성일"
     },
     "actions": {
       "open-menu": "메뉴 열기",

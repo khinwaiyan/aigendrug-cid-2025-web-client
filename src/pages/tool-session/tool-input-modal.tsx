@@ -13,6 +13,7 @@ import { isOk, unwrapOrThrow } from "../../service/service-wrapper";
 import { useService } from "../../service/use-service";
 import { Tool, ToolInteractionElement } from "../../service/tool/interface";
 import styles from "../../styles/tool.module.scss";
+import { useNavigate } from "react-router";
 
 type ToolInputModalProps = {
   toolInputModalVisible: boolean;
@@ -30,7 +31,7 @@ export default function ToolInputModal({
   const [formTexts, setFormTexts] = useState<Record<string, string>>({});
   const [formNumbers, setFormNumbers] = useState<Record<string, number>>({});
   const [formFiles, setFormFiles] = useState<Record<string, File[]>>({});
-
+  const navigate = useNavigate();
   useEffect(() => {
     if (!toolId) {
       return;
@@ -80,15 +81,15 @@ export default function ToolInputModal({
       };
     });
 
-    const result = await toolService.runTool(tool.id, request); // correct the result type which includes status
-    // TODO: route to tool session page and add the tool request to the session
+    // TODO check runTool result type
+    const result = await toolService.runTool(tool.id, request);
+    // TODO: add the tool request to the toolLinkSession
     if (isOk(result)) {
       console.log("Tool request submitted successfully:", result.data);
-      // TODO: route to tool session page
-
       setFormTexts({});
       setFormNumbers({});
       setFormFiles({});
+      navigate("/tool-session");
     } else {
       console.error("Error running tool:", result.error);
     }
