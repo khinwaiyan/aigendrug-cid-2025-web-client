@@ -2,10 +2,8 @@ import { APP_NAME } from "../../common/constants";
 import { BreadcrumbGroup, ContentLayout } from "@cloudscape-design/components";
 import { useOnFollow } from "../../common/hooks/use-on-follow";
 import BaseAppLayout from "../../components/base-app-layout";
-import { useParams } from "react-router-dom";
-import { isOk } from "../../service/service-wrapper";
+import { useLocation, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { useService } from "../../service/use-service";
 import styles from "../../styles/tool.module.scss";
 import { useTranslation } from "react-i18next";
 import ToolOutputHeader from "./tool-output-header";
@@ -15,27 +13,47 @@ export default function ToolOutputPage() {
     string,
     string | number | boolean
   > | null>(null);
-  const { toolService } = useService();
   const onFollow = useOnFollow();
   const { toolId, sessionId } = useParams();
   const { t } = useTranslation(["tool"]);
+  const location = useLocation();
 
+  // Get responseData from navigation state
+  const responseData = location.state?.responseData;
+
+  // Parse responseData if it's a stringified object
   useEffect(() => {
-    if (!toolId) {
-      return;
-    }
-    const fetch = async () => {
-      // TODO: check implementation to fetch tool output
-
-      const result = await toolService.getToolOutput(toolId); // what to add to getToolOutput?
-      if (isOk(result)) {
-        setToolOutput(JSON.parse(result.data!));
-      } else {
-        console.error("Error running tool:", result.error);
+    if (typeof responseData === "string") {
+      try {
+        const parsed = JSON.parse(responseData);
+        setToolOutput(parsed);
+      } catch {
+        // Not JSON, treat as raw text output
+        setToolOutput({ result: responseData });
       }
-    };
-    fetch();
-  }, []);
+    } else if (responseData && typeof responseData === "object") {
+      setToolOutput(responseData);
+    } else {
+      setToolOutput(null);
+    }
+  }, [responseData]);
+
+  // useEffect(() => {
+  //   if (!toolId) {
+  //     return;
+  //   }
+  //   const fetch = async () => {
+  //     // TODO: check implementation to fetch tool output
+
+  //     const result = await toolService.getToolOutput(toolId); // what to add to getToolOutput?
+  //     if (isOk(result)) {
+  //       setToolOutput(JSON.parse(result.data!));
+  //     } else {
+  //       console.error("Error running tool:", result.error);
+  //     }
+  //   };
+  //   fetch();
+  // }, []);
 
   return (
     <BaseAppLayout
