@@ -8,7 +8,6 @@ import ChatWidget from "./components/chat-widget/chat-widget";
 import { GeneralProvider } from "./context/general-context";
 import ToolRegistrationPage from "./pages/tool-registration/tool-registration-page";
 import ToolSessionPage from "./pages/tool-session/tool-session-page";
-import ToolInputPage from "./pages/tool-session/tool-input-page";
 import ToolOutputPage from "./pages/tool-session/tool-output-page";
 
 export default function App() {
@@ -25,10 +24,6 @@ export default function App() {
               element={<ToolRegistrationPage />}
             />
             <Route path="/tool-session" element={<ToolSessionPage />} />
-            <Route
-              path="/tool-input/:sessionId/:toolId"
-              element={<ToolInputPage />}
-            />
             <Route
               path="/tool-out/:sessionId/:toolId"
               element={<ToolOutputPage />}

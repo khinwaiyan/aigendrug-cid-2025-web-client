@@ -2,7 +2,7 @@ import { APP_NAME } from "../../common/constants";
 
 import { BaseLayout } from "../../components/base-layout";
 import ToolRegistrationHeader from "./tool-registration-header";
-import ToolsTable from "./data-table";
+import ToolsTable from "./tools-table";
 import { useTranslation } from "react-i18next";
 
 export default function ToolRegistrationPage() {
