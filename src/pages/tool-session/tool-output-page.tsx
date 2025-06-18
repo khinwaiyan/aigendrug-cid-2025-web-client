@@ -1,19 +1,16 @@
 import { APP_NAME } from "../../common/constants";
-import { BreadcrumbGroup, ContentLayout } from "@cloudscape-design/components";
-import { useOnFollow } from "../../common/hooks/use-on-follow";
-import BaseAppLayout from "../../components/base-app-layout";
 import { useLocation, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import styles from "../../styles/tool.module.scss";
 import { useTranslation } from "react-i18next";
 import ToolOutputHeader from "./tool-output-header";
+import { BaseLayout } from "../../components/base-layout";
 
 export default function ToolOutputPage() {
   const [toolOutput, setToolOutput] = useState<Record<
     string,
     string | number | boolean
   > | null>(null);
-  const onFollow = useOnFollow();
   const { toolId, sessionId } = useParams();
   const { t } = useTranslation(["tool"]);
   const location = useLocation();
@@ -56,42 +53,35 @@ export default function ToolOutputPage() {
   // }, []);
 
   return (
-    <BaseAppLayout
-      breadcrumbs={
-        <BreadcrumbGroup
-          onFollow={onFollow}
-          items={[
-            {
-              text: APP_NAME,
-              href: "/",
-            },
-            {
-              text: "Tool Output",
-              href: `/tool-output/${sessionId}/${toolId}`,
-            },
-          ]}
-        />
-      }
-      content={
-        <>
-          {toolOutput ? (
-            <ContentLayout header={<ToolOutputHeader />}>
-              <div className={styles.tool_container}>
-                <p className={styles.tool_output_title}>
-                  {typeof toolOutput.result === "string" ||
-                  typeof toolOutput.result === "number"
-                    ? toolOutput.result
-                    : typeof toolOutput.result === "boolean"
-                    ? toolOutput.result.toString()
-                    : t("tool-output.error")}
-                </p>
-              </div>
-            </ContentLayout>
-          ) : (
-            <div>Waiting for the result</div>
-          )}
-        </>
-      }
-    />
+    <BaseLayout
+      breadcrumbs={[
+        {
+          text: APP_NAME,
+          href: "/",
+        },
+        {
+          text: t("tool-output.title"),
+          href: `/tool-output/${sessionId}/${toolId}`,
+        },
+      ]}
+    >
+      <ToolOutputHeader />
+      <>
+        {toolOutput ? (
+          <div className={styles.tool_container}>
+            <p className={styles.tool_output_title}>
+              {typeof toolOutput.result === "string" ||
+              typeof toolOutput.result === "number"
+                ? toolOutput.result
+                : typeof toolOutput.result === "boolean"
+                ? toolOutput.result.toString()
+                : t("tool-output.error")}
+            </p>
+          </div>
+        ) : (
+          <div>Waiting for the result</div>
+        )}
+      </>
+    </BaseLayout>
   );
 }
