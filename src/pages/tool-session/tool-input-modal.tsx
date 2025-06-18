@@ -1,19 +1,19 @@
 import {
-  Box,
-  SpaceBetween,
-  Button,
-  Modal,
-  FormField,
-  Input,
-  FileUpload,
-} from "@cloudscape-design/components";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "../../components/ui/dialog";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { isOk, unwrapOrThrow } from "../../service/service-wrapper";
 import { useService } from "../../service/use-service";
 import { Tool, ToolInteractionElement } from "../../service/tool/interface";
-import styles from "../../styles/tool.module.scss";
 import { useNavigate } from "react-router";
+import { Loader2 } from "lucide-react";
 
 type ToolInputModalProps = {
   toolInputModalVisible: boolean;
@@ -31,6 +31,8 @@ export default function ToolInputModal({
   const [formTexts, setFormTexts] = useState<Record<string, string>>({});
   const [formNumbers, setFormNumbers] = useState<Record<string, number>>({});
   const [formFiles, setFormFiles] = useState<Record<string, File[]>>({});
+  const [submitting, setSubmitting] = useState(false);
+
   const navigate = useNavigate();
   useEffect(() => {
     if (!toolId) {
@@ -59,9 +61,21 @@ export default function ToolInputModal({
       setFormFiles((prev) => ({ ...prev, [key]: value }));
     }
   };
-
+  const handleFileChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    key: string
+  ) => {
+    if (e.target.files) {
+      handleInputChange({
+        type: "file",
+        key,
+        value: Array.from(e.target.files),
+      });
+    }
+  };
   const handleSubmit = async () => {
     if (!tool) return;
+    setSubmitting(true);
 
     const request = tool.provider_interface.requestInterface.map((field) => {
       const key = field.key;
@@ -83,6 +97,7 @@ export default function ToolInputModal({
 
     // TODO check runTool result type
     const result = await toolService.runTool(tool.id, request);
+    setSubmitting(false);
     // TODO: add the tool request to the toolLinkSession
     if (isOk(result)) {
       console.log("Tool request submitted successfully:", result.data);
@@ -91,114 +106,93 @@ export default function ToolInputModal({
       setFormFiles({});
       navigate("/tool-session");
     } else {
-      console.error("Error running tool:", result.error);
+      alert("Error running tool.");
     }
   };
   return (
-    <Modal
-      size="medium"
-      onDismiss={() => setToolInputModalVisible(false)}
-      visible={toolInputModalVisible}
-      footer={
-        <Box float="right">
-          <SpaceBetween direction="horizontal" size="xs">
-            <Button
-              variant="link"
-              onClick={() => setToolInputModalVisible(false)}
-            >
-              {t("base:cancel")}
-            </Button>
-            <Button
-              variant="primary"
-              onClick={() => {
-                handleSubmit();
-                setToolInputModalVisible(false);
-                window.location.href = `/tool-session`;
-              }}
-            >
-              {t("tool-input.run-model")}
-            </Button>
-          </SpaceBetween>
-        </Box>
-      }
-      header={
-        <SpaceBetween direction="horizontal" size="l" alignItems="center">
-          {tool?.name}
-        </SpaceBetween>
-      }
+    <Dialog
+      open={toolInputModalVisible}
+      onOpenChange={setToolInputModalVisible}
     >
-      {!tool ? (
-        <div>Loading tool...</div>
-      ) : (
-        <div className={styles.tool_input_form_container}>
-          <SpaceBetween size="xxl">
-            {tool.provider_interface.requestInterface.map((field) => {
-              return (
-                <div key={field.id}>
-                  {field.valueType === "string" && (
-                    <FormField label={field.key} stretch={true}>
-                      <Input
-                        type="text"
-                        value={formTexts[field.key]}
-                        placeholder={`Enter ${field.key}`}
-                        onChange={(e) =>
-                          handleInputChange({
-                            type: "string",
-                            key: field.key,
-                            value: e.detail.value,
-                          })
-                        }
-                      />
-                    </FormField>
-                  )}
-                  {field.valueType === "number" && (
-                    <FormField label={field.key} stretch={true}>
-                      <Input
-                        type="number"
-                        inputMode="numeric"
-                        value={(formNumbers[field.key] ?? 0).toString()}
-                        placeholder={`Enter ${field.key}`}
-                        onChange={(e) =>
-                          handleInputChange({
-                            type: "number",
-                            key: field.key,
-                            value: Number(e.detail.value),
-                          })
-                        }
-                      />
-                    </FormField>
-                  )}
-                  {field.valueType === "file" && (
-                    <FormField label={field.key} stretch={true}>
-                      <FileUpload
-                        value={formFiles[field.key] ?? []}
-                        onChange={(e) =>
-                          handleInputChange({
-                            type: "file",
-                            key: field.key,
-                            value: e.detail.value,
-                          })
-                        }
-                        i18nStrings={{
-                          uploadButtonText: (e) =>
-                            e ? "Choose files" : "Choose file",
-                          dropzoneText: (e) =>
-                            e ? "Drop files to upload" : "Drop file to upload",
-                          removeFileAriaLabel: (e) => `Remove file ${e + 1}`,
-                          limitShowFewer: "Show fewer files",
-                          limitShowMore: "Show more files",
-                          errorIconAriaLabel: "Error",
-                          warningIconAriaLabel: "Warning",
-                        }}
-                      />
-                    </FormField>
-                  )}
-                </div>
-              );
-            })}
-          </SpaceBetween>
-        </div>
-      )}
-    </Modal>
+      <DialogContent className="sm:max-w-xl max-w-[95vw]">
+        <DialogHeader>
+          <DialogTitle className="text-lg font-semibold">
+            {tool?.name || t("loading")}
+          </DialogTitle>
+        </DialogHeader>
+        {!tool ? (
+          <div className="flex items-center justify-center h-32">
+            <Loader2 className="animate-spin w-6 h-6 text-muted-foreground" />
+          </div>
+        ) : (
+          <form
+            className="flex flex-col gap-4"
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSubmit();
+            }}
+          >
+            {tool.provider_interface.requestInterface.map((field) => (
+              <div key={field.id} className="flex flex-col gap-1">
+                <label className="text-sm font-medium text-muted-foreground mb-1">
+                  {field.key}
+                </label>
+                {field.valueType === "string" && (
+                  <Input
+                    type="text"
+                    value={formTexts[field.key] || ""}
+                    placeholder={`Enter ${field.key}`}
+                    onChange={(e) =>
+                      handleInputChange({
+                        type: "string",
+                        key: field.key,
+                        value: e.target.value,
+                      })
+                    }
+                  />
+                )}
+                {field.valueType === "number" && (
+                  <Input
+                    type="number"
+                    value={formNumbers[field.key] ?? ""}
+                    placeholder={`Enter ${field.key}`}
+                    onChange={(e) =>
+                      handleInputChange({
+                        type: "number",
+                        key: field.key,
+                        value: Number(e.target.value),
+                      })
+                    }
+                  />
+                )}
+                {field.valueType === "file" && (
+                  <Input
+                    type="file"
+                    multiple
+                    onChange={(e) => handleFileChange(e, field.key)}
+                  />
+                )}
+              </div>
+            ))}
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setToolInputModalVisible(false)}
+                disabled={submitting}
+              >
+                {t("base:cancel")}
+              </Button>
+              <Button type="submit" disabled={submitting}>
+                {submitting ? (
+                  <Loader2 className="animate-spin w-4 h-4 mr-2" />
+                ) : null}
+                {t("tool-input.run-model")}
+              </Button>
+            </DialogFooter>
+          </form>
+        )}
+      </DialogContent>
+    </Dialog>
   );
 }
