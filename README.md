@@ -42,8 +42,6 @@ To use this application, make sure you have the following installed:
    cd aigendrug-cid-2025-web-client
    ```
 
-````
-
 2. Install dependencies:
 
    ```bash
@@ -68,45 +66,46 @@ To use this application, make sure you have the following installed:
 
 ### Dashboard
 
-* Displays the number of currently active **sessions** and **registered tools**.
-* From this page, you can:
+- Displays the number of currently active **sessions** and **registered tools**.
+- From this page, you can:
 
-  * View detailed session list
-  * Add or delete sessions
-  * Check each session’s name, status, and the ID of any tool running within it
-* You can navigate to other parts of the app using the top **navigation bar**
+  - View detailed session list
+  - Add or delete sessions
+  - Check each session’s name, status, and the ID of any tool running within it
+
+- You can navigate to other parts of the app using the top **navigation bar**
 
 ---
 
 ### Session List Page
 
-* Accessed from the sidebar or via the floating chat button (FAB)
-* Allows users to:
+- Accessed from the sidebar or via the floating chat button (FAB)
+- Allows users to:
 
-  * View existing chat sessions
-  * Start a **new session** for tool recommendation or chat
-  * Continue previously created sessions
+  - View existing chat sessions
+  - Start a **new session** for tool recommendation or chat
+  - Continue previously created sessions
 
 ---
 
 ### Tool List & Register Page
 
-* View all **registered tools** in a searchable, sortable table
-* Each tool shows metadata including tool name, interface type, and expected input
-* You can register new tools in the **Tool Register Page** via:
+- View all **registered tools** in a searchable, sortable table
+- Each tool shows metadata including tool name, interface type, and expected input
+- You can register new tools in the **Tool Register Page** via:
 
-  * A manual JSON form
-  * Uploading a `.json` file matching the expected schema
+  - A manual JSON form
+  - Uploading a `.json` file matching the expected schema
 
 ---
 
 ### Tool Recommendation Page
 
-* Found inside the chat session screen
-* Users can input natural language queries
-  *e.g. “I want to find potential inhibitors for protein X”*
-* The system recommends appropriate tools based on the input
-* Click the **“Use Tool”** button next to a recommendation to go to the **Tool Input Page**
+- Found inside the chat session screen
+- Users can input natural language queries
+  _e.g. “I want to find potential inhibitors for protein X”_
+- The system recommends appropriate tools based on the input
+- Click the **“Use Tool”** button next to a recommendation to go to the **Tool Input Page**
 
 ---
 
@@ -114,65 +113,68 @@ To use this application, make sure you have the following installed:
 
 #### Tool Input Page
 
-* Dynamically renders input forms based on tool specification
-* Supported input types include:
+- Dynamically renders input forms based on tool specification
+- Supported input types include:
 
-  * Numeric fields
-  * SMILES strings
-  * CSV file upload
-* After submitting the form:
+  - Numeric fields
+  - SMILES strings
+  - CSV file upload
 
-  * The tool execution is triggered
-  * You are redirected to the **Tool Session List Page**
+- After submitting the form:
+
+  - The tool execution is triggered
+  - You are redirected to the **Tool Session List Page**
 
 #### Tool Session List Page
 
-* Displays a list of all tool executions under the current session
-* Shows:
+- Displays a list of all tool executions under the current session
+- Shows:
 
-  * Tool name
-  * Execution status (`pending`, `running`, `success`, `failed`)
-  * Creation timestamp
-* You can filter the list by status
-* Clicking on a successfully executed tool redirects to the **Tool Output Page**
+  - Tool name
+  - Execution status (`pending`, `running`, `success`, `failed`)
+  - Creation timestamp
+
+- You can filter the list by status
+- Clicking on a successfully executed tool redirects to the **Tool Output Page**
 
 #### Tool Output Page
 
-* Shows the final results returned by the tool
-* Output formats vary by tool and can include:
+- Shows the final results returned by the tool
+- Output formats vary by tool and can include:
 
-  * Tables
-  * Images
-  * Text summaries
-  * Downloadable files
+  - Tables
+  - Images
+  - Text summaries
+  - Downloadable files
 
 ---
 
 ## Using the Chat Feature
 
-* A **Floating Action Button (FAB)** with the AIGENDRUG logo is visible in the bottom-right of all pages
-* Clicking it opens the **chat modal**
-* Features include:
+- A **Floating Action Button (FAB)** with the AIGENDRUG logo is visible in the bottom-right of all pages
+- Clicking it opens the **chat modal**
+- Features include:
 
-  * Viewing existing sessions
-  * Starting a new session
-  * Asking natural language queries to get tool recommendations
-* Serves as the main entry point to the recommendation pipeline
+  - Viewing existing sessions
+  - Starting a new session
+  - Asking natural language queries to get tool recommendations
+
+- Serves as the main entry point to the recommendation pipeline
 
 ---
 
 ## Troubleshooting
 
-* **White screen on load**
+- **White screen on load**
   Ensure `.env` has the correct `VITE_API_BASE_URL` pointing to the backend server.
 
-* **Tool list not loading**
+- **Tool list not loading**
   Confirm the backend is running and reachable from the frontend.
 
-* **CORS errors in browser console**
+- **CORS errors in browser console**
   Backend server may be missing CORS headers. Enable them for the frontend origin.
 
-* **Chat is not responding**
+- **Chat is not responding**
   Backend LLM pipeline or LangGraph service may be down. Restart or inspect logs.
 
 ---
@@ -184,4 +186,3 @@ For questions, bug reports, or further assistance, contact:
 📧 [khinwaiyan@snu.ac.kr](mailto:khinwaiyan@snu.ac.kr)
 
 ---
-````
