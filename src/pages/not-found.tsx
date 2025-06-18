@@ -1,50 +1,38 @@
-import {
-  Alert,
-  BreadcrumbGroup,
-  Container,
-  ContentLayout,
-  Header,
-  SpaceBetween,
-} from "@cloudscape-design/components";
-import { useOnFollow } from "../common/hooks/use-on-follow";
 import { APP_NAME } from "../common/constants";
-import BaseAppLayout from "../components/base-app-layout";
+import { BaseLayout } from "../components/base-layout";
+import { Card } from "../components/ui/card";
+import { AlertTriangle } from "lucide-react";
+import { Button } from "../components/ui/button";
+import { Link } from "react-router-dom";
 
 export default function NotFound() {
-  const onFollow = useOnFollow();
-
   return (
-    <BaseAppLayout
-      breadcrumbs={
-        <BreadcrumbGroup
-          onFollow={onFollow}
-          items={[
-            {
-              text: APP_NAME,
-              href: "/",
-            },
-            {
-              text: "Not Found",
-              href: "/not-found",
-            },
-          ]}
-          expandAriaLabel="Show path"
-          ariaLabel="Breadcrumbs"
-        />
-      }
-      content={
-        <ContentLayout
-          header={<Header variant="h1">404. Page Not Found</Header>}
-        >
-          <SpaceBetween size="l">
-            <Container>
-              <Alert type="error" header="404. Page Not Found">
-                The page you are looking for does not exist.
-              </Alert>
-            </Container>
-          </SpaceBetween>
-        </ContentLayout>
-      }
-    />
+    <BaseLayout
+      breadcrumbs={[
+        {
+          text: APP_NAME,
+          href: "/",
+        },
+        {
+          text: "Not Found",
+          href: "/not-found",
+        },
+      ]}
+    >
+      <div className="flex flex-col items-center justify-center min-h-[70vh] py-12">
+        <Card className="w-full max-w-md p-8 shadow-2xl flex flex-col items-center gap-4 border-destructive border">
+          <AlertTriangle className="text-destructive w-10 h-10 mb-2" />
+          <h1 className="text-3xl font-bold text-destructive">
+            404. Page Not Found
+          </h1>
+          <p className="text-muted-foreground text-center">
+            The page you are looking for does not exist.
+          </p>
+          <Button variant="default" className="mt-4">
+            <Link to="/">Go Home</Link>
+          </Button>
+        </Card>
+      </div>
+    </BaseLayout>
   );
 }
