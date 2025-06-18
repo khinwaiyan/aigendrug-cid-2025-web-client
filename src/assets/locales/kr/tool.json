@@ -2,6 +2,9 @@
   "registration": {
     "title": "도구 등록"
   },
+  "session": {
+    "title": "도구 세션"
+  },
   "tool-input": {
     "title": "도구 입력",
     "run-model": "모델 실행"
@@ -20,7 +23,13 @@
     "column": {
       "name": "이름",
       "status": "상태",
-      "tool-id": "고유 ID"
+      "tool-id": "고유 ID",
+      "created-at": "생성일"
+    },
+    "actions": {
+      "open-menu": "메뉴 열기",
+      "copy-tool-id": "툴 ID 복사",
+      "delete-session": "세션 삭제"
     }
   }
 }

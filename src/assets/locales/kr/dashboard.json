@@ -15,7 +15,13 @@
     "column": {
       "name": "이름",
       "status": "상태",
-      "assigned-tool": "할당된 툴"
+      "assigned-tool": "할당된 툴",
+      "created-at": "생성일"
+    },
+    "actions": {
+      "open-menu": "메뉴 열기",
+      "copy-tool-id": "툴 ID 복사",
+      "delete-session": "세션 삭제"
     }
   }
 }

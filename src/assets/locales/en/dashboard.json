@@ -15,7 +15,13 @@
     "column": {
       "name": "Name",
       "status": "Status",
-      "assigned-tool": "Assigned Tool"
+      "assigned-tool": "Assigned Tool",
+      "created-at": "Created At"
+    },
+    "actions": {
+      "open-menu": "Open Menu",
+      "copy-tool-id": "Copy Tool ID",
+      "delete-session": "Delete Session"
     }
   }
 }

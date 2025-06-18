@@ -1,11 +1,11 @@
 import { useTranslation } from "react-i18next";
 
-export default function DashboardHeader() {
-  const { t } = useTranslation();
+export default function ToolSessionHeader() {
+  const { t } = useTranslation(["tool"]);
 
   return (
     <header className="pt-2 pb-4 text-2xl font-bold">
-      {t("navigation-panel.dashboard")}
+      {t("session.title")}
     </header>
   );
 }

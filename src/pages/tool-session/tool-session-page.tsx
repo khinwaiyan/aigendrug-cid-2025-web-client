@@ -1,11 +1,11 @@
 import { APP_NAME } from "../../common/constants";
 
 import { BaseLayout } from "../../components/base-layout";
-import ToolRegistrationHeader from "./tool-registration-header";
-import ToolsTable from "./tools-table";
 import { useTranslation } from "react-i18next";
+import ToolSessionHeader from "./tool-session-header";
+import ToolSessionTable from "./tool-session-table";
 
-export default function ToolRegistrationPage() {
+export default function ToolSessionPage() {
   const { t } = useTranslation([], { keyPrefix: "navigation-panel" });
 
   return (
@@ -16,14 +16,14 @@ export default function ToolRegistrationPage() {
           href: "/",
         },
         {
-          text: t("tool-registration"),
-          href: "/tool-registration",
+          text: t("tool-session"),
+          href: "/tool-session",
         },
       ]}
     >
-      <ToolRegistrationHeader />
+      <ToolSessionHeader />
       <div className="space-y-6">
-        <ToolsTable />
+        <ToolSessionTable />
       </div>
     </BaseLayout>
   );

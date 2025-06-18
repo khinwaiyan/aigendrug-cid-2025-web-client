@@ -6,11 +6,10 @@
   padding: 30px;
   display: flex;
   flex-direction: column;
-
-  max-width: 720px;
+  width: 100%;
 }
 
 .tool_output_title {
-  font-size: awsui.$font-size-heading-l;
+  font-size: awsui.$font-size-heading-s;
   font-weight: awsui.$font-weight-heading-l;
 }

@@ -90,3 +90,14 @@ export interface ToolInteractionElement {
     | object[];
   interface_id: string;
 }
+
+export interface ReadToolRequestDTO {
+  id: number;
+  toolId: number;
+  toolName: string;
+  status: "pending" | "success" | "failed";
+  createdAt: string;
+  updatedAt: string;
+  requestData: ToolInteractionElement[];
+  responseData: string | null;
+}

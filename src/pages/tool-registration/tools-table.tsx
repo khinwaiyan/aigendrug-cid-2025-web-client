@@ -1,249 +1,287 @@
 import {
-  Box,
-  SpaceBetween,
-  TableProps,
-  Header,
-  Table,
-  Button,
-  Modal,
-  TextContent,
-  Link,
-  FileInput,
-} from "@cloudscape-design/components";
-import { TextHelper } from "../../common/helpers/text-helper";
-import { useEffect, useMemo, useState } from "react";
-import { useTranslation } from "react-i18next";
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+} from "../../components/ui/dialog";
+import { DataTable } from "../../components/ui/data-table";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Skeleton } from "../../components/ui/skeleton";
 import { useService } from "../../service/use-service";
 import { unwrapOr } from "../../service/service-wrapper";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Tool } from "../../service/tool/interface";
+import { ColumnDef } from "@tanstack/react-table";
+import { useTranslation } from "react-i18next";
 import ToolCreator from "./tool-creator";
-import ToolInputModal from "../tool-session/tool-input-modal";
+import { Checkbox } from "../../components/ui/checkbox";
+import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../../components/ui/dropdown-menu";
 import { useGeneralContext } from "../../context/general-context";
 
-const sampleToolJson = `{
-  "id": "00000000-0000-0000-0000-000000000000",
-  "version": "1.0.0",
-  "name": "Tool Name",
-  "description": "Tool Description",
-  "created_at": "2025-03-26",
-  "provider_interface": {}
-}`;
-
 export default function ToolsTable() {
-  const { t } = useTranslation(["tool"]);
+  const { t } = useTranslation(["tool", "base", "chatWidget"]);
   const { toolService } = useService();
-
-  const [loading, setLoading] = useState(false);
   const [tools, setTools] = useState<Tool[]>([]);
   const [selectedItems, setSelectedItems] = useState<Tool[]>([]);
-  const [toolCreateModalVisible, setToolCreateModalVisible] = useState(false);
+  const [rowSelection, setRowSelection] = useState({});
+  const [loading, setLoading] = useState(false);
   const [toolDeleteModalVisible, setToolDeleteModalVisible] = useState(false);
-  const [jsonFile, setJsonFile] = useState<File | null>(null);
-  const [jsonContent, setJsonContent] = useState<string>(sampleToolJson);
-  const [toolInputModalVisible, setToolInputModalVisible] = useState(false);
-  const [selectedToolId, setSelectedToolId] = useState<string | null>(null);
+  const [toolCreateModalVisible, setToolCreateModalVisible] = useState(false);
+  const [jsonContent, setJsonContent] = useState("");
+  const [, setJsonFile] = useState<File | null>(null);
   const { generalState, updateGenerateState } = useGeneralContext();
+  const columnName = t("table.column.name");
+  const columnToolId = t("table.column.tool-id");
+  const actionCopyToolId = t("table.actions.copy-tool-id");
+  const actionDeleteSession = t("table.actions.delete-session");
+  const actionOpenMenu = t("table.actions.open-menu");
 
-  const ItemsColumnDefinitions = useMemo<TableProps.ColumnDefinition<Tool>[]>(
+  const fetchTools = useCallback(async () => {
+    setLoading(true);
+    const fetched = unwrapOr(await toolService.getAllTools(), []);
+    setTools(fetched);
+    setLoading(false);
+  }, [toolService]);
+
+  const columns: ColumnDef<Tool>[] = useMemo(
     () => [
       {
-        id: "name",
-        header: t("table.column.name"),
-        sortingField: "name",
-        cell: (item) => (
-          <Link
-            external
-            onFollow={(e) => {
-              e.preventDefault();
-              setSelectedToolId(item.id);
-              setToolInputModalVisible(true);
-            }}
-          >
-            {item.name}
-          </Link>
+        id: "select",
+        header: ({ table }) => (
+          <Checkbox
+            checked={
+              table.getIsAllPageRowsSelected() ||
+              (table.getIsSomePageRowsSelected() && "indeterminate")
+            }
+            onCheckedChange={(value) =>
+              table.toggleAllPageRowsSelected(!!value)
+            }
+            aria-label="Select all"
+          />
         ),
-        isRowHeader: true,
+        cell: ({ row }) => (
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            aria-label="Select row"
+          />
+        ),
+        enableSorting: false,
+        enableHiding: false,
       },
-      // {
-      //   id: "status",
-      //   header: t("table.column.status"),
-      //   sortingField: "status",
-      //   cell: (item) => (
-      //     <StatusIndicator type="success">{item.status}</StatusIndicator>
-      //   ),
-      //   minWidth: 120,
-      // },
       {
-        id: "id",
-        header: t("table.column.tool-id"),
-        sortingField: "id",
-        cell: (item) => item.id,
+        accessorKey: "name",
+        header: ({ column }) => (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            {columnName}
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        ),
+        cell: ({ row }) => row.original.name,
+      },
+      {
+        accessorKey: "id",
+        header: columnToolId,
+      },
+      {
+        id: "actions",
+        cell: ({ row }) => {
+          const tool = row.original;
+
+          return (
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <Button variant="ghost" className="h-8 w-8 p-0">
+                  <span className="sr-only">{actionOpenMenu}</span>
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={() => navigator.clipboard.writeText(tool.id)}
+                >
+                  {actionCopyToolId}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={async () => {
+                    await toolService.deleteTool(tool.id);
+                    const deletedToolIds = selectedItems.map((item) => item.id);
+
+                    updateGenerateState({
+                      toolSessionLinks: generalState.toolSessionLinks.filter(
+                        (link) => !deletedToolIds.includes(link.toolId)
+                      ),
+                    });
+                    await fetchTools();
+                  }}
+                >
+                  {actionDeleteSession}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          );
+        },
       },
     ],
-    [t]
+    [
+      columnName,
+      columnToolId,
+      actionCopyToolId,
+      actionDeleteSession,
+      actionOpenMenu,
+      selectedItems,
+      toolService,
+      updateGenerateState,
+      generalState.toolSessionLinks,
+      fetchTools,
+    ]
   );
-
-  async function fetchTools() {
-    setLoading(true);
-    const tools = unwrapOr(await toolService.getAllTools(), []);
-    setTools(tools);
-    setLoading(false);
-  }
 
   useEffect(() => {
     fetchTools();
   }, []);
 
   return (
-    <>
-      <Table
-        loading={loading}
-        loadingText={t("loading")}
-        selectionType="multi"
-        empty={
-          <Box margin={{ vertical: "xs" }} textAlign="center" color="inherit">
-            <SpaceBetween size="xxs">
-              <div>
-                <b>{t("no-items")}</b>
-                <Box variant="p" color="inherit">
-                  {t("no-items-description")}
-                </Box>
-              </div>
-            </SpaceBetween>
-          </Box>
-        }
-        columnDefinitions={ItemsColumnDefinitions}
-        items={tools.sort((a, b) => a.name.localeCompare(b.name))}
-        selectedItems={selectedItems}
-        onSelectionChange={(event: {
-          detail: TableProps.SelectionChangeDetail<Tool>;
-        }) => setSelectedItems(event.detail.selectedItems)}
-        header={
-          <Header
-            counter={TextHelper.getHeaderCounterText(tools, selectedItems)}
-            actions={
-              <SpaceBetween direction="horizontal" size="xs">
-                <Button
-                  variant="primary"
-                  onClick={() => {
-                    setToolCreateModalVisible(true);
-                  }}
-                >
-                  {t("table.add-item")}
-                </Button>
-                <Button
-                  disabled={selectedItems.length === 0}
-                  onClick={() => {
-                    setToolDeleteModalVisible(true);
-                  }}
-                >
-                  {t("table.delete")}
-                </Button>
-              </SpaceBetween>
-            }
-          >
-            {t("table.title")}
-          </Header>
-        }
-      />
-      <Modal
-        size="large"
-        onDismiss={() => setToolCreateModalVisible(false)}
-        visible={toolCreateModalVisible}
-        footer={
-          <Box float="right">
-            <SpaceBetween direction="horizontal" size="xs">
-              <Button
-                variant="link"
-                onClick={() => setToolCreateModalVisible(false)}
-              >
-                {t("base:cancel")}
-              </Button>
-              <Button
-                variant="primary"
-                onClick={async () => {
-                  await toolService.createTool(JSON.parse(jsonContent));
-                  await fetchTools();
-                  setJsonContent(sampleToolJson);
-                  setJsonFile(null);
-                  setToolCreateModalVisible(false);
-                }}
-              >
-                {t("base:save")}
-              </Button>
-            </SpaceBetween>
-          </Box>
-        }
-        header={
-          <SpaceBetween direction="horizontal" size="l" alignItems="center">
-            {t("table.add-item")}
-            <FileInput
-              onChange={({ detail }) => {
-                setJsonFile(detail.value[0]);
-                detail.value[0].text().then((text) => {
-                  setJsonContent(text);
-                });
-              }}
-              value={jsonFile ? [jsonFile] : []}
-              accept=".json"
-              ariaRequired
-            >
-              {t("upload-json")}
-            </FileInput>
-          </SpaceBetween>
-        }
-      >
-        <ToolCreator content={jsonContent} setContent={setJsonContent} />
-      </Modal>
-      <Modal
-        onDismiss={() => setToolDeleteModalVisible(false)}
-        visible={toolDeleteModalVisible}
-        footer={
-          <Box float="right">
-            <SpaceBetween direction="horizontal" size="xs">
-              <Button
-                variant="link"
-                onClick={() => setToolDeleteModalVisible(false)}
-              >
-                {t("base:cancel")}
-              </Button>
-              <Button
-                variant="primary"
-                onClick={async () => {
-                  await Promise.all(
-                    selectedItems.map((item) => toolService.deleteTool(item.id))
-                  );
-                  const deletedToolIds = selectedItems.map((item) => item.id);
+    <div className="flex flex-col gap-4">
+      {/* Toolbar */}
+      <div className="flex justify-end gap-2">
+        <Button
+          variant="outline"
+          onClick={() => setToolCreateModalVisible(true)}
+        >
+          {t("table.add-item")}
+        </Button>
+        <Button
+          variant="outline"
+          disabled={selectedItems.length === 0}
+          onClick={() => setToolDeleteModalVisible(true)}
+        >
+          {t("table.delete")}
+        </Button>
+      </div>
 
-                  updateGenerateState({
-                    toolSessionLinks: generalState.toolSessionLinks.filter(
-                      (link) => !deletedToolIds.includes(link.toolId)
-                    ),
-                  });
-
-                  setSelectedItems([]);
-                  await fetchTools();
-                  setToolDeleteModalVisible(false);
-                }}
-              >
-                {t("base:delete")}
-              </Button>
-            </SpaceBetween>
-          </Box>
-        }
-        header={t("chatWidget:delete-chat")}
-      >
-        <TextContent>
-          <p>{t("chatWidget:delete-chat-confirm")}</p>
-        </TextContent>
-      </Modal>
-      {toolInputModalVisible && selectedToolId && (
-        <ToolInputModal
-          toolInputModalVisible={toolInputModalVisible}
-          setToolInputModalVisible={setToolInputModalVisible}
-          toolId={selectedToolId}
+      {/* Table or Skeleton */}
+      {loading ? (
+        <Skeleton className="h-48 w-full rounded-md" />
+      ) : (
+        <DataTable
+          columns={columns}
+          data={tools.sort((a, b) => a.name.localeCompare(b.name))}
+          rowSelection={rowSelection}
+          setRowSelection={setRowSelection}
+          onSelectedRowsChange={setSelectedItems}
         />
       )}
-    </>
+
+      {/* Create Dialog */}
+      <Dialog
+        open={toolCreateModalVisible}
+        onOpenChange={setToolCreateModalVisible}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("table.add-item")}</DialogTitle>
+          </DialogHeader>
+          <div className="flex items-center justify-between mb-2">
+            <label
+              htmlFor="json-upload"
+              className="text-sm font-medium text-muted-foreground"
+            >
+              {t("upload-json")}
+            </label>
+            <Input
+              id="json-upload"
+              type="file"
+              accept=".json"
+              className="w-auto"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (!file) return;
+                file.text().then(setJsonContent);
+                setJsonFile(file);
+              }}
+            />
+          </div>
+          <ToolCreator content={jsonContent} setContent={setJsonContent} />
+          <DialogFooter>
+            <Button
+              variant="ghost"
+              onClick={() => setToolCreateModalVisible(false)}
+            >
+              {t("base:cancel")}
+            </Button>
+            <Button
+              onClick={async () => {
+                await toolService.createTool(JSON.parse(jsonContent));
+                await fetchTools();
+                setToolCreateModalVisible(false);
+                setJsonContent("");
+                setJsonFile(null);
+              }}
+            >
+              {t("base:save")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Dialog */}
+      <Dialog
+        open={toolDeleteModalVisible}
+        onOpenChange={setToolDeleteModalVisible}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("chatWidget:delete-chat")}</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            {t("chatWidget:delete-chat-confirm")}
+          </p>
+          <DialogFooter>
+            <Button
+              variant="ghost"
+              onClick={() => setToolDeleteModalVisible(false)}
+            >
+              {t("base:cancel")}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={async () => {
+                await Promise.all(
+                  selectedItems.map((item) => toolService.deleteTool(item.id))
+                );
+                const deletedToolIds = selectedItems.map((item) => item.id);
+
+                updateGenerateState({
+                  toolSessionLinks: generalState.toolSessionLinks.filter(
+                    (link) => !deletedToolIds.includes(link.toolId)
+                  ),
+                });
+
+                setSelectedItems([]);
+                setRowSelection({});
+                await fetchTools();
+                setToolDeleteModalVisible(false);
+              }}
+            >
+              {t("base:delete")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }
