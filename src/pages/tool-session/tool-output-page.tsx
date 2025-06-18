@@ -15,17 +15,15 @@ export default function ToolOutputPage() {
   const { t } = useTranslation(["tool"]);
   const location = useLocation();
 
-  // Get responseData from navigation state
+  //TODO
   const responseData = location.state?.responseData;
 
-  // Parse responseData if it's a stringified object
   useEffect(() => {
     if (typeof responseData === "string") {
       try {
         const parsed = JSON.parse(responseData);
         setToolOutput(parsed);
       } catch {
-        // Not JSON, treat as raw text output
         setToolOutput({ result: responseData });
       }
     } else if (responseData && typeof responseData === "object") {
@@ -34,23 +32,6 @@ export default function ToolOutputPage() {
       setToolOutput(null);
     }
   }, [responseData]);
-
-  // useEffect(() => {
-  //   if (!toolId) {
-  //     return;
-  //   }
-  //   const fetch = async () => {
-  //     // TODO: check implementation to fetch tool output
-
-  //     const result = await toolService.getToolOutput(toolId); // what to add to getToolOutput?
-  //     if (isOk(result)) {
-  //       setToolOutput(JSON.parse(result.data!));
-  //     } else {
-  //       console.error("Error running tool:", result.error);
-  //     }
-  //   };
-  //   fetch();
-  // }, []);
 
   return (
     <BaseLayout

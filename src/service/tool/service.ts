@@ -45,7 +45,7 @@ export class ToolService {
     );
   }
 
-  // TODO: getToolRequestList => keep polling until all the request is not pending
+  // TODO
   async getToolRequestList(): Promise<Result<ReadToolRequestDTO[]>> {
     return wrapPromise(
       this.instance.get("tool/request-list").then((res) => res.data)

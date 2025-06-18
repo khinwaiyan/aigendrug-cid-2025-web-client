@@ -98,7 +98,6 @@ export default function ToolInputModal({
     // TODO check runTool result type
     const result = await toolService.runTool(tool.id, request);
     setSubmitting(false);
-    // TODO: add the tool request to the toolLinkSession
     if (isOk(result)) {
       console.log("Tool request submitted successfully:", result.data);
       setFormTexts({});

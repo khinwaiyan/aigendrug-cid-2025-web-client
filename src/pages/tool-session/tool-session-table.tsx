@@ -186,7 +186,6 @@ export default function ToolSessionTable() {
         </div>
       </div>
 
-      {/* TODO: add filter status */}
       <div className="flex items-center justify-end py-2">
         <DropdownMenu>
           <DropdownMenuTrigger>
