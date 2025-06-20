@@ -65,6 +65,7 @@ To use this application, make sure you have the following installed:
 ## Navigating the Application
 
 ### Dashboard
+<img width="391" alt="Screenshot 2025-06-20 at 4 43 36 PM" src="https://github.com/user-attachments/assets/3d03cb70-184b-4272-a8c5-a78ed50d07f3" />
 
 - Displays the number of currently active **sessions** and **registered tools**.
 - From this page, you can:
@@ -78,6 +79,7 @@ To use this application, make sure you have the following installed:
 ---
 
 ### Session List Page
+<img width="390" alt="Screenshot 2025-06-20 at 4 44 27 PM" src="https://github.com/user-attachments/assets/fbc5ecb7-2054-457a-8d1a-fe21a3a194d6" />
 
 - Accessed from the sidebar or via the floating chat button (FAB)
 - Allows users to:
@@ -89,17 +91,15 @@ To use this application, make sure you have the following installed:
 ---
 
 ### Tool List & Register Page
+<img width="358" alt="Screenshot 2025-06-20 at 4 49 17 PM" src="https://github.com/user-attachments/assets/0273447e-06a6-49b9-a500-4311b286ceed" />
 
 - View all **registered tools** in a searchable, sortable table
 - Each tool shows metadata including tool name, interface type, and expected input
-- You can register new tools in the **Tool Register Page** via:
-
-  - A manual JSON form
-  - Uploading a `.json` file matching the expected schema
 
 ---
 
 ### Tool Recommendation Page
+<img width="405" alt="Screenshot 2025-06-20 at 4 50 08 PM" src="https://github.com/user-attachments/assets/d27c7c29-1c4c-44c4-8b5a-a1efe99c22a7" />
 
 - Found inside the chat session screen
 - Users can input natural language queries
@@ -109,9 +109,10 @@ To use this application, make sure you have the following installed:
 
 ---
 
-### Tool Input & Output Page
+### Tool Input & Output Modal
 
-#### Tool Input Page
+#### Tool Input Modal
+<img width="437" alt="Screenshot 2025-06-20 at 4 50 30 PM" src="https://github.com/user-attachments/assets/2e1114cf-e3f6-4d50-8a6d-4b52467d1da5" />
 
 - Dynamically renders input forms based on tool specification
 - Supported input types include:
@@ -126,6 +127,7 @@ To use this application, make sure you have the following installed:
   - You are redirected to the **Tool Session List Page**
 
 #### Tool Session List Page
+<img width="391" alt="Screenshot 2025-06-20 at 4 51 06 PM" src="https://github.com/user-attachments/assets/8ee6c06b-527a-4065-aa60-72b7e9876988" />
 
 - Displays a list of all tool executions under the current session
 - Shows:
@@ -135,9 +137,10 @@ To use this application, make sure you have the following installed:
   - Creation timestamp
 
 - You can filter the list by status
-- Clicking on a successfully executed tool redirects to the **Tool Output Page**
+- Clicking on a successfully executed tool shows the **Tool Output Modal**
 
-#### Tool Output Page
+#### Tool Output Modal
+<img width="413" alt="Screenshot 2025-06-20 at 4 51 38 PM" src="https://github.com/user-attachments/assets/b2d5984f-0d5c-4a55-b533-674af2fd75d3" />
 
 - Shows the final results returned by the tool
 - Output formats vary by tool and can include:
